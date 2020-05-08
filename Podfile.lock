@@ -22,6 +22,7 @@ PODS:
   - GBDeviceInfo (6.3.0):
     - GBDeviceInfo/Core (= 6.3.0)
   - GBDeviceInfo/Core (6.3.0)
+  - INTULocationManager (4.3.2)
   - IQKeyboardManager (6.5.5)
   - JSONModel (1.8.0)
   - MBProgressHUD (1.2.0)
@@ -33,6 +34,7 @@ DEPENDENCIES:
   - Charts
   - FCUUID
   - GBDeviceInfo
+  - INTULocationManager
   - IQKeyboardManager
   - JSONModel
   - MBProgressHUD
@@ -44,6 +46,7 @@ SPEC REPOS:
     - Charts
     - FCUUID
     - GBDeviceInfo
+    - INTULocationManager
     - IQKeyboardManager
     - JSONModel
     - MBProgressHUD
@@ -55,12 +58,13 @@ SPEC CHECKSUMS:
   Charts: 40a08591df1f8ad5c223ddedfb1a06da92f24f7c
   FCUUID: bb054fc90cd7cd99320f9f6ff8e130fe607fba05
   GBDeviceInfo: a3f39dba1a04dcb630abff65d6f7e8fbf319eadd
+  INTULocationManager: e5dc524611b0cd582f473bc56cc8c389adb2f338
   IQKeyboardManager: 3a8b9e603f8b0eeaf5f096a1f2b2cfcf121992ef
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
   PhoneNetSDK: d0f24d066e8a7f2dd8e7c1a162d4c6910266def7
   UICKeyChainStore: 85db518bb1d294366d15ec9b92a416c4e670518f
 
-PODFILE CHECKSUM: e09403fc0093e13ffd02e017eb60ca32b4f5e724
+PODFILE CHECKSUM: 2ee10c8a5928e0e57b1e6370c689de800add0572
 
 COCOAPODS: 1.8.4

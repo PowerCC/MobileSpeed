@@ -13,6 +13,7 @@
 		8233CAD52453E5690017C52B /* TracerouteCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233CAD12453E5690017C52B /* TracerouteCommon.m */; };
 		8233CADB245437990017C52B /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233CAD9245437980017C52B /* SimplePing.m */; };
 		8233CADC245437990017C52B /* FFSimplePingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233CADA245437980017C52B /* FFSimplePingHelper.m */; };
+		827002D224652AA6001F5F06 /* DeviceInfoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 827002D124652AA6001F5F06 /* DeviceInfoModel.m */; };
 		82AE4520245138E300DEFD98 /* SpeedTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 82AE451F245138E300DEFD98 /* SpeedTestViewController.m */; };
 		82AE452324518AA000DEFD98 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 82AE452224518AA000DEFD98 /* TestUtils.m */; };
 		82AF57C62455345B00FDA95A /* SpeedUpUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 82AF57C52455345B00FDA95A /* SpeedUpUtils.m */; };
@@ -45,6 +46,8 @@
 		8233CAD8245437980017C52B /* FFSimplePingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFSimplePingHelper.h; sourceTree = "<group>"; };
 		8233CAD9245437980017C52B /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
 		8233CADA245437980017C52B /* FFSimplePingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FFSimplePingHelper.m; sourceTree = "<group>"; };
+		827002D024652AA6001F5F06 /* DeviceInfoModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceInfoModel.h; sourceTree = "<group>"; };
+		827002D124652AA6001F5F06 /* DeviceInfoModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceInfoModel.m; sourceTree = "<group>"; };
 		82AE451E245138E300DEFD98 /* SpeedTestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpeedTestViewController.h; sourceTree = "<group>"; };
 		82AE451F245138E300DEFD98 /* SpeedTestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SpeedTestViewController.m; sourceTree = "<group>"; };
 		82AE452124518AA000DEFD98 /* TestUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestUtils.h; sourceTree = "<group>"; };
@@ -133,6 +136,8 @@
 		82AF57C824555F3F00FDA95A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				827002D024652AA6001F5F06 /* DeviceInfoModel.h */,
+				827002D124652AA6001F5F06 /* DeviceInfoModel.m */,
 				82AF57C924555FAE00FDA95A /* SpeedUpModels.h */,
 				82AF57CA24555FAE00FDA95A /* SpeedUpModels.m */,
 			);
@@ -328,6 +333,7 @@
 				82E99BFE24503C250006FED0 /* DeviceUtils.m in Sources */,
 				820C6211245E7E4E00D097D7 /* NSString+Extension.m in Sources */,
 				82E99BE4244FE8950006FED0 /* AppDelegate.m in Sources */,
+				827002D224652AA6001F5F06 /* DeviceInfoModel.m in Sources */,
 				82AF57CE24557EF000FDA95A /* Tools.m in Sources */,
 				8233CAD42453E5690017C52B /* TracerouteRecord.m in Sources */,
 				8233CAD52453E5690017C52B /* TracerouteCommon.m in Sources */,

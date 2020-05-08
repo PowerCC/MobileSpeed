@@ -6,13 +6,15 @@
 //  Copyright © 2020 邹程. All rights reserved.
 //
 
+#import <FCUUID/FCUUID.h>
+#import <INTULocationManager/INTULocationManager.h>
 #import "ViewController.h"
 #import "SpeedTestViewController.h"
 #import "Marco.h"
 #import "Tools.h"
 #import "SpeedUpUtils.h"
 #import "SpeedUpModels.h"
-#import <FCUUID/FCUUID.h>
+#import "DeviceInfoModel.h"
 
 @interface ViewController ()
 
@@ -39,6 +41,16 @@
         self->_areaInfoModel = model;
         self->_extranetIPLabel.text = [NSString stringWithFormat:@"外网IP：%@", model.ip];
         self->_locationLabel.text = [NSString stringWithFormat:@"当前位置：%@",  model.regionName];
+
+        DeviceInfoModel *infoModel = [DeviceInfoModel shared];
+        infoModel.osVer = self->_osVerLabel.text;
+        infoModel.phoneModel = self->_phoneModelLabel.text;
+        infoModel.mobileNetworkStandard = self->_mobileNetworkStandardLabel.text;
+        infoModel.uuid = self->_imeiLabel.text;
+        infoModel.intranetIP = self->_intranetIP;
+        infoModel.extranetIP = model.ip;
+        infoModel.cityCode = model.code;
+        infoModel.location = model.regionName;
     }];
 }
 
@@ -51,13 +63,6 @@
 //    self.imsiLabel.text = [DeviceUtils getDeviceIMSIValue];
 
     PhoneNetManager *phoneNetManager = [PhoneNetManager shareInstance];
-//    [phoneNetManager registPhoneNetSDK];
-
-//    NSDictionary *ipDic = [self deviceWANIPAddress];
-//    if (ipDic && ipDic.count > 0) {
-//        self.extranetIPLabel.text = [NSString stringWithFormat:@"外网IP：%@", ipDic[@"ip"]];
-//        self.locationLabel.text = [NSString stringWithFormat:@"当前位置：%@%@",  ipDic[@"country"], ipDic[@"city"]];
-//    }
 
     if ([phoneNetManager.netGetNetworkInfo.deviceNetInfo.netType isEqual:@"WIFI"]) {
         self.intranetIP = phoneNetManager.netGetNetworkInfo.deviceNetInfo.wifiIPV4;
@@ -67,19 +72,27 @@
         self.intranetIPLabel.text = [NSString stringWithFormat:@"内网IP：%@", phoneNetManager.netGetNetworkInfo.deviceNetInfo.cellIPV4];
     }
 
-    self.latitudeLabel.text = nil;
-    self.longitudeLabel.text = nil;
-}
-
-- (NSDictionary *)deviceWANIPAddress {
-    NSURL *ipURL = [NSURL URLWithString:@"https://www.ip.cn/"];
-    NSData *data = [NSData dataWithContentsOfURL:ipURL];
-    NSDictionary *ipDic = nil;
-    if (data && data.length > 0) {
-        ipDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
-    }
-
-    return ipDic;
+    INTULocationManager *locMgr = [INTULocationManager sharedInstance];
+    [locMgr requestLocationWithDesiredAccuracy:INTULocationAccuracyCity
+                                       timeout:10.0
+                          delayUntilAuthorized:YES
+                                         block:^(CLLocation *currentLocation, INTULocationAccuracy achievedAccuracy, INTULocationStatus status) {
+        if (status == INTULocationStatusSuccess) {
+            NSString *la = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
+            NSString *lo = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
+            self.latitudeLabel.text = [NSString stringWithFormat:@"经度：%@", la];
+            self.longitudeLabel.text = [NSString stringWithFormat:@"纬度：%@", lo];
+            DeviceInfoModel *infoModel = [DeviceInfoModel shared];
+            infoModel.latitude = la;
+            infoModel.longitude = lo;
+        } else if (status == INTULocationStatusTimedOut) {
+            self.latitudeLabel.text = nil;
+            self.longitudeLabel.text = nil;
+        } else {
+            self.latitudeLabel.text = nil;
+            self.longitudeLabel.text = nil;
+        }
+    }];
 }
 
 - (void)initSpeedUpUtils {
