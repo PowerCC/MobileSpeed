@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSDictionary *)convert2DictionaryWithJSONString:(NSString *)jsonString;
 
++ (NSString *)dictionaryToJson:(NSDictionary *)dic;
+
 + (void)saveToUserDefaults:(NSString *)key value:(id)value;
 
 + (NSString *)loadStringFromUserDefaults:(NSString *)key;

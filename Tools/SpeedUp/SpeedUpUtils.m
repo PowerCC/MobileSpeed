@@ -9,6 +9,7 @@
 #import "SpeedUpUtils.h"
 #import "Marco.h"
 #import <AFNetworking/AFNetworking.h>
+#import "Tools.h"
 
 @implementation SpeedUpUtils
 
@@ -121,14 +122,16 @@
     }];
 }
 
-- (void)tracertReport:(NSString *)paramsDic {
-    [self request:tracertReportUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-        NSLog(@"%@ %@", response, responseObject);
-        if (error) {
-            NSLog(@"Error: %@", error);
-        } else {
-        }
-    }];
+- (void)tracertReport:(NSDictionary *)paramsDic {
+    if (paramsDic && paramsDic.count > 0) {
+        [self request:tracertReportUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+            NSLog(@"%@ %@", response, responseObject);
+            if (error) {
+                NSLog(@"Error: %@", error);
+            } else {
+            }
+        }];
+    }
 }
 
 @end

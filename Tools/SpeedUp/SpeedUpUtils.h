@@ -31,7 +31,7 @@ typedef void(^CancelTecentGamesQoS)(SpeedUpCancelTecentGamesQoSModel *_Nullable 
 
 - (void)cancelTecentGamesQoS:(NSString *)publicIp cancelTecentGamesQoS:(CancelTecentGamesQoS)cancelTecentGamesQoS;
 
-- (void)tracertReport:(NSString *)paramsDic;
+- (void)tracertReport:(NSDictionary *)paramsDic;
 @end
 
 NS_ASSUME_NONNULL_END

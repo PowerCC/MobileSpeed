@@ -63,7 +63,7 @@
 
 // [self.simplePing start] 失败
 - (void)simplePing:(SimplePing *)pinger didFailWithError:(NSError *)error {
-    NSString *failCreateLog = [NSString stringWithFormat:@"#%ld try create failed: %@", self.receivedOrDelayCount, [self shortErrorFromError:error]];
+    NSString *failCreateLog = [NSString stringWithFormat:@"#%ld try create failed: %@", (long)self.receivedOrDelayCount, [self shortErrorFromError:error]];
     NSLog(@"didFailWithError:%@", failCreateLog);
     //启动发送data失败
     [self stopPing];

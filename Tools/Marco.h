@@ -9,6 +9,8 @@
 #ifndef Marco_h
 #define Marco_h
 
+#define WeakSelf __weak typeof(self) weakSelf = self;
+
 #define tracertReportUrl @"http://npm.kgogogo.com/tracertReport"
 
 #define getTokenUrl @"http://qos.189.cn/qos-api/getToken?appid=bcmTest"

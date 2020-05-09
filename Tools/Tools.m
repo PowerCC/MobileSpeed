@@ -41,6 +41,14 @@
     return dic;
 }
 
++ (NSString *)dictionaryToJson:(NSDictionary *)dic {
+    NSError *parseError = nil;
+
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:nil error:&parseError];
+
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 + (void)saveToUserDefaults:(NSString *)key value:(id)value {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setValue:value forKey:key];

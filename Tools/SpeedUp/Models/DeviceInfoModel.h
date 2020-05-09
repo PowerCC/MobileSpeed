@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *latitude;
 @property (copy, nonatomic) NSString *longitude;
 @property (copy, nonatomic) NSString *location;
+@property (copy, nonatomic) NSString *ispId;
 
 + (instancetype)shared;
 

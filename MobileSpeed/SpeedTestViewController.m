@@ -13,6 +13,8 @@
 #import "SpeedUpUtils.h"
 #import "Traceroute.h"
 #import "NSString+Extension.h"
+#import "DeviceInfoModel.h"
+#import "FFSimplePingHelper.h"
 
 @interface SpeedTestViewController () <ChartViewDelegate>
 
@@ -25,7 +27,6 @@
 
 @property (strong, nonatomic) SpeedUpUtils *speedUpUtils;
 @property (strong, nonatomic) PNTcpPing *tcpPing;
-@property (strong, nonatomic) PNUdpTraceroute *pnUdpTraceroute;
 @property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
 @property (strong, nonatomic) Traceroute *traceroute;
 
@@ -33,6 +34,7 @@
 @property (assign, nonatomic) BOOL httpTesting;
 @property (assign, nonatomic) BOOL udpTesting;
 @property (assign, nonatomic) BOOL traceTesting;
+@property (assign, nonatomic) BOOL backFlag;
 
 @end
 
@@ -141,6 +143,25 @@
     _speedUpUtils = [[SpeedUpUtils alloc] init];
 }
 
+- (void)uploadResult:(NSString *)method testParams:(NSDictionary *)testPrarms {
+    DeviceInfoModel *infoModel = [DeviceInfoModel shared];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    params[@"appId"] = @"zhongxin";
+    params[@"duration"] = self.timeTextField.text;
+    params[@"ispId"] = infoModel.ispId;
+    params[@"latitude"] = infoModel.latitude;
+    params[@"longitude"] = infoModel.longitude;
+    params[@"msgId"] = infoModel.uuid;
+    params[@"privateIp"] = infoModel.intranetIP;
+    params[@"publicIp"] = infoModel.extranetIP;
+    params[@"serverPort"] = self.portTextField.text;
+    params[@"testMethod"] = method;
+    params[@"userId"] = @"testUserId";
+    [params addEntriesFromDictionary:testPrarms];
+
+    [_speedUpUtils tracertReport:params];
+}
+
 - (void)formatTcpPingResultText:(UITextView *)textView {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.resultTextArray.count > 0) {
@@ -173,6 +194,17 @@
                                 NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / self.resultTextArray.count * 100)];
 
                                 textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
+
+                                NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                                params[@"totalPacketCount"] = [NSString stringWithFormat:@"%lu", (unsigned long)self.resultTextArray.count];
+                                params[@"averageDelayMillis"] = [NSString stringWithFormat:@"%@ms", avg];
+                                params[@"maxDelayMillis"] = [NSString stringWithFormat:@"%.3fms", maxTime];
+                                params[@"minDelayMillis"] = [NSString stringWithFormat:@"%.3fms", minTime];
+                                params[@"droppedPacketCount"] = [NSString stringWithFormat:@"%@", loss];
+                                params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%.f%%", ([loss doubleValue] / self.resultTextArray.count * 100)];
+                                params[@"tracertResult"] = @[textView.text];
+
+                                [self uploadResult:@"PING" testParams:params];
                             }
                         }
                     }
@@ -229,6 +261,17 @@
                     NSString *text6 = [NSString stringWithFormat:@"丢包率：%@%%\n", loss];
 
                     textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
+
+                    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                    params[@"totalPacketCount"] = packets;
+                    params[@"averageDelayMillis"] = delay;
+                    params[@"maxDelayMillis"] = [NSString stringWithFormat:@"%.3fms", maxTime];
+                    params[@"minDelayMillis"] = [NSString stringWithFormat:@"%.3fms", minTime];
+                    params[@"droppedPacketCount"] = [NSString stringWithFormat:@"%lu", (unsigned long)lossPacketArray.count];
+                    params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%@%%", loss];
+                    params[@"tracertResult"] = @[textView.text];
+
+                    [self uploadResult:@"UDP" testParams:params];
                 }
             }
         }
@@ -333,24 +376,25 @@
 
         [self initTestStartText:_resultTextView];
 
-        NSString *target = _ipTextField.text;
-        NSInteger port = [_portTextField.text integerValue];
-        NSString *time = _timeTextField.text;
+        NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSString *time = [_timeTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSInteger port = [[_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] integerValue];
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
         _resultTextArray = [NSMutableArray arrayWithCapacity:0];
 
+        WeakSelf;
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                countdown -= 1;
-                               self->_countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
+                               weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
                                if (countdown <= 0) {
-                                   [self->_countdownLabel setHidden:YES];
-                                   self->_pingTesting = NO;
-                                   [self->_tcpPing stopTcpPing];
-                                   [self->_timer invalidate];
+                                   [weakSelf.countdownLabel setHidden:YES];
+                                   weakSelf.pingTesting = NO;
+                                   [weakSelf.tcpPing stopTcpPing];
+                                   [weakSelf.timer invalidate];
                                }
                            });
         }];
@@ -359,24 +403,24 @@
         _tcpPing = [TestUtils tcpPing:target port:port count:1000 complete:^(NSMutableString *result) {
             NSLog(@"%@", result);
             if ([result containsString:@"TCP conn loss"]) {
-                [self formatTcpPingResultText:self->_resultTextView];
+                [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
             } else if ([result containsString:@"connect failed"] || [result containsString:@"DNS error"]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                                   [self->_timer invalidate];
-                                   [self->_countdownLabel setHidden:YES];
-                                   self->_pingTesting = NO;
-                                   [self formatTcpPingResultText:self->_resultTextView];
+                                   [weakSelf.timer invalidate];
+                                   [weakSelf.countdownLabel setHidden:YES];
+                                   weakSelf.pingTesting = NO;
+                                   [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
                                });
             } else {
-                [self->_resultTextArray addObject:result];
+                [weakSelf.resultTextArray addObject:result];
                 NSArray *pingTextArray = [result componentsSeparatedByString:@",  "];
                 if (pingTextArray && pingTextArray.count >= 2) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                                        NSString *temp = [NSString stringWithFormat:@" ms \nconn to @%@:80", target];
                                        NSString *tempDelay = [pingTextArray[pingTextArray.count - 1] stringByReplacingOccurrencesOfString:temp withString:@""];
                                        NSString *delay = [tempDelay stringByReplacingOccurrencesOfString:@" ms \n" withString:@""];
-                                       [self.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
-                                       [self setChartData];
+                                       [weakSelf.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
+                                       [weakSelf setChartData];
                                        index++;
                                    });
                 }
@@ -404,25 +448,27 @@
         [_traceTestResultView setHidden:NO];
         _traceResultTextView.text = @"";
 
+        WeakSelf;
         _downloadTask = [_speedUpUtils downloadFile:netSpeed progress:^(NSProgress *_Nonnull downloadProgress) {
 //        NSLog(@"%lld\n", downloadProgress.totalUnitCount );
 //        NSLog(@"%lld\n", downloadProgress.completedUnitCount );
             NSString *progessString = [NSString stringWithFormat:@"文件已下载：%.f%%\n", downloadProgress.fractionCompleted * 100];
             dispatch_async(dispatch_get_main_queue(), ^{
-                               self->_traceResultTextView.text = progessString;
+                               weakSelf.traceResultTextView.text = progessString;
                            });
         } completionHandler:^(NSURLResponse *_Nonnull response, NSURL *_Nonnull filePath, NSError *_Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                               NSMutableString *text = [self->_traceResultTextView.text mutableCopy];
+                               NSMutableString *text = [weakSelf.traceResultTextView.text mutableCopy];
                                if (error) {
                                    [text appendString:@"> 下载失败 <"];
                                } else {
                                    [text appendString:@"> 下载成功 <"];
                                }
-                               self->_httpTesting = NO;
-                               self->_traceResultTextView.text = [text copy];
+                               weakSelf.httpTesting = NO;
+                               weakSelf.traceResultTextView.text = [text copy];
+
+                               [weakSelf enabledAllButton];
                            });
-            [self enabledAllButton];
         }];
     }
 }
@@ -451,38 +497,42 @@
 
         [self initTestStartText:_resultTextView];
 
-        NSString *target = _ipTextField.text;
-        NSString *time = _timeTextField.text;
+        NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSString *time = [_timeTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
         _resultTextArray = [NSMutableArray arrayWithCapacity:0];
 
+        WeakSelf;
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                countdown -= 1;
-                               self->_countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
+                               weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
                                if (countdown <= 0) {
-                                   [self->_countdownLabel setHidden:YES];
-                                   self->_udpTesting = NO;
+                                   [weakSelf.countdownLabel setHidden:YES];
+                                   weakSelf.udpTesting = NO;
                                    [TestUtils stopPing];
-                                   [self->_timer invalidate];
-                                   [self formatResultText:self->_resultTextView];
+                                   [weakSelf.timer invalidate];
+                                   [weakSelf formatResultText:weakSelf.resultTextView];
                                }
                            });
         }];
 
         __block double index = 1.0;
+//        _simplePingHelper = [[FFSimplePingHelper alloc] initWithHostName:target];
+//        _simplePingHelper.delayTime = val;
+//        [_simplePingHelper startPing];
         [TestUtils ping:target packetCount:1000 pingResultHandler:^(NSString *_Nullable pingres, BOOL doingPing) {
             NSLog(@"%@", pingres);
-            [self->_resultTextArray addObject:pingres];
+            [weakSelf.resultTextArray addObject:pingres];
             NSArray *pingTextArray = [pingres componentsSeparatedByString:@"time="];
             if (pingTextArray && pingTextArray.count == 2) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                                    NSString *delay = [pingTextArray[1] stringByReplacingOccurrencesOfString:@"ms" withString:@""];
-                                   [self.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
-                                   [self setChartData];
+                                   [weakSelf.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
+                                   [weakSelf setChartData];
                                    index++;
                                });
             }
@@ -509,27 +559,42 @@
         [_traceTestResultView setHidden:NO];
         _traceResultTextView.text = @"";
 
-        NSString *target = _ipTextField.text;
-        NSString *port = _portTextField.text;
+        NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSString *port = [_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+        WeakSelf;
         _traceroute = [Traceroute startTracerouteWithHost:target
                                                      port:port
                                                     queue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
                                              stepCallback:^(TracerouteRecord *record) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                               NSString *text = [NSString stringWithFormat:@"%@%@\n", self->_traceResultTextView.text, record];
-                               self->_traceResultTextView.text = text;
+                               NSString *text = [NSString stringWithFormat:@"%@%@\n", weakSelf.traceResultTextView.text, record];
+                               weakSelf.traceResultTextView.text = text;
                            });
         } finish:^(NSArray<TracerouteRecord *> *results, BOOL succeed) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                               NSMutableString *text = [self->_traceResultTextView.text mutableCopy];
+                               NSMutableString *text = [weakSelf.traceResultTextView.text mutableCopy];
                                if (succeed) {
                                    [text appendString:@"> Traceroute成功 <"];
                                } else {
                                    [text appendString:@"> Traceroute失败 <"];
                                }
-                               self->_traceResultTextView.text = [text copy];
-                               self->_traceTesting = NO;
-                               [self enabledAllButton];
+                               weakSelf.traceResultTextView.text = [text copy];
+                               weakSelf.traceTesting = NO;
+
+                               NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                               params[@"totalPacketCount"] = @"0";
+                               params[@"averageDelayMillis"] = @"0";
+                               params[@"maxDelayMillis"] = @"0";
+                               params[@"minDelayMillis"] = @"0";
+                               params[@"droppedPacketCount"] = @"0";
+                               params[@"droppedPacketRatio"] = @"0";
+                               params[@"bandWidth"] = @"1.0";
+                               params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
+
+                               [weakSelf uploadResult:@"TRACE" testParams:params];
+
+                               [weakSelf enabledAllButton];
                            });
         }];
     }
@@ -543,16 +608,16 @@
         [_downloadTask cancel];
     }
     if (_udpTesting) {
-        [_pnUdpTraceroute stopUdpTraceroute];
+        [TestUtils stopPing];
     }
     if (_traceTesting) {
         _traceroute.maxTtl = 0;
     }
-    
+
     _tcpPing = nil;
     _downloadTask = nil;
-    _pnUdpTraceroute = nil;
     _traceroute = nil;
+    _speedUpUtils = nil;
     [self dismissViewControllerAnimated:YES completion:^{
     }];
 }

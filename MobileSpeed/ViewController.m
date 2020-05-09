@@ -36,21 +36,24 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    WeakSelf;
     [_speedUpUtils getAreaInfo:^(SpeedUpAreaInfoModel *_Nullable model) {
         NSLog(@"%@", model);
-        self->_areaInfoModel = model;
-        self->_extranetIPLabel.text = [NSString stringWithFormat:@"外网IP：%@", model.ip];
-        self->_locationLabel.text = [NSString stringWithFormat:@"当前位置：%@",  model.regionName];
+        weakSelf.areaInfoModel = model;
+        weakSelf.extranetIPLabel.text = [NSString stringWithFormat:@"外网IP：%@", model.ip];
+        weakSelf.locationLabel.text = [NSString stringWithFormat:@"当前位置：%@",  model.regionName];
 
         DeviceInfoModel *infoModel = [DeviceInfoModel shared];
-        infoModel.osVer = self->_osVerLabel.text;
-        infoModel.phoneModel = self->_phoneModelLabel.text;
-        infoModel.mobileNetworkStandard = self->_mobileNetworkStandardLabel.text;
-        infoModel.uuid = self->_imeiLabel.text;
-        infoModel.intranetIP = self->_intranetIP;
+        infoModel.osVer = weakSelf.osVerLabel.text;
+        infoModel.phoneModel = weakSelf.phoneModelLabel.text;
+        infoModel.mobileNetworkStandard = weakSelf.mobileNetworkStandardLabel.text;
+        infoModel.uuid = [FCUUID uuid];
+        infoModel.intranetIP = weakSelf.intranetIP;
         infoModel.extranetIP = model.ip;
         infoModel.cityCode = model.code;
         infoModel.location = model.regionName;
+        infoModel.ispId = model.ispId;
     }];
 }
 
