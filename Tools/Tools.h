@@ -11,6 +11,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Tools : NSObject
++ (NSString *)uuidString;
+
 + (void)showPrompt:(NSString *)text superView:(UIView *)superView numberOfLines:(NSInteger)numberOfLines afterDelay:(NSTimeInterval)afterDelay completion:(nullable MBProgressHUDCompletionBlock)completion;
 
 + (NSDictionary *)convert2DictionaryWithJSONString:(NSString *)jsonString;
@@ -23,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (id)loadObjectFromUserDefaults:(NSString *)key;
 
++ (NSString *)intervalSinceNow:(NSDate *)theDate;
 @end
 
 NS_ASSUME_NONNULL_END

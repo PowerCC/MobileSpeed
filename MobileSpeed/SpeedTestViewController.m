@@ -14,9 +14,9 @@
 #import "Traceroute.h"
 #import "NSString+Extension.h"
 #import "DeviceInfoModel.h"
-#import "FFSimplePingHelper.h"
+#import "GCDAsyncUdpSocket.h"
 
-@interface SpeedTestViewController () <ChartViewDelegate>
+@interface SpeedTestViewController () <GCDAsyncUdpSocketDelegate, ChartViewDelegate>
 
 @property (strong, nonatomic) UIColor *enabledColor;
 @property (strong, nonatomic) UIColor *disabledColor;
@@ -28,7 +28,14 @@
 @property (strong, nonatomic) SpeedUpUtils *speedUpUtils;
 @property (strong, nonatomic) PNTcpPing *tcpPing;
 @property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
+@property (strong, nonatomic) GCDAsyncUdpSocket *udpSocket;
 @property (strong, nonatomic) Traceroute *traceroute;
+
+@property (copy, nonatomic) NSString *udpTestString;
+@property (assign, nonatomic) NSInteger udpIndex;
+@property (assign, nonatomic) NSInteger udpLoss;
+@property (strong, nonatomic) NSDate *udpStartDate;
+@property (strong, nonatomic) NSDate *udpEndDate;
 
 @property (assign, nonatomic) BOOL pingTesting;
 @property (assign, nonatomic) BOOL httpTesting;
@@ -49,6 +56,7 @@
 
     [self initUI];
     [self initSpeedUpUtils];
+    [self initSocket];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -143,6 +151,10 @@
     _speedUpUtils = [[SpeedUpUtils alloc] init];
 }
 
+- (void)initSocket {
+    _udpSocket = [[GCDAsyncUdpSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+}
+
 - (void)uploadResult:(NSString *)method testParams:(NSDictionary *)testPrarms {
     DeviceInfoModel *infoModel = [DeviceInfoModel shared];
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
@@ -151,7 +163,7 @@
     params[@"ispId"] = infoModel.ispId;
     params[@"latitude"] = infoModel.latitude;
     params[@"longitude"] = infoModel.longitude;
-    params[@"msgId"] = infoModel.uuid;
+    params[@"msgId"] = [Tools uuidString];
     params[@"privateIp"] = infoModel.intranetIP;
     params[@"publicIp"] = infoModel.extranetIP;
     params[@"serverPort"] = self.portTextField.text;
@@ -387,15 +399,15 @@
         WeakSelf;
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                               countdown -= 1;
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-                               if (countdown <= 0) {
+                               if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.pingTesting = NO;
                                    [weakSelf.tcpPing stopTcpPing];
                                    [weakSelf.timer invalidate];
                                }
+                               countdown -= 1;
                            });
         }];
 
@@ -467,6 +479,18 @@
                                weakSelf.httpTesting = NO;
                                weakSelf.traceResultTextView.text = [text copy];
 
+                               NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                               params[@"totalPacketCount"] = @"0";
+                               params[@"averageDelayMillis"] = @"0";
+                               params[@"maxDelayMillis"] = @"0";
+                               params[@"minDelayMillis"] = @"0";
+                               params[@"droppedPacketCount"] = @"0";
+                               params[@"droppedPacketRatio"] = @"0";
+                               params[@"bandWidth"] = @"1.0";
+                               params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
+
+                               [weakSelf uploadResult:@"HTTP" testParams:params];
+
                                [weakSelf enabledAllButton];
                            });
         }];
@@ -474,6 +498,8 @@
 }
 
 - (IBAction)udpAction:(id)sender {
+    _udpIndex = 0;
+    _udpLoss = 0;
     if (_udpTesting) {
         _udpTesting = NO;
         [TestUtils stopPing];
@@ -499,43 +525,41 @@
 
         NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
         NSString *time = [_timeTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSInteger port = [[_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] integerValue];
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
         _resultTextArray = [NSMutableArray arrayWithCapacity:0];
 
         WeakSelf;
+//        __block NSInteger index = 1;
+
+        NSError *error = nil;
+        [_udpSocket bindToPort:port error:&error];
+        if (error) {//监听错误打印错误信息
+            NSLog(@"error:%@", error);
+        } else {//监听成功则开始接收信息
+            [_udpSocket beginReceiving:&error];
+        }
+
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                               countdown -= 1;
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-                               if (countdown <= 0) {
+                               [weakSelf.udpSocket sendData:[@"test" dataUsingEncoding:NSUTF8StringEncoding] toHost:target port:port withTimeout:-1 tag:0];
+
+                               weakSelf.udpStartDate = [NSDate date];
+
+                               if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.udpTesting = NO;
-                                   [TestUtils stopPing];
+                                   [weakSelf.udpSocket pauseReceiving];
                                    [weakSelf.timer invalidate];
                                    [weakSelf formatResultText:weakSelf.resultTextView];
                                }
-                           });
-        }];
 
-        __block double index = 1.0;
-//        _simplePingHelper = [[FFSimplePingHelper alloc] initWithHostName:target];
-//        _simplePingHelper.delayTime = val;
-//        [_simplePingHelper startPing];
-        [TestUtils ping:target packetCount:1000 pingResultHandler:^(NSString *_Nullable pingres, BOOL doingPing) {
-            NSLog(@"%@", pingres);
-            [weakSelf.resultTextArray addObject:pingres];
-            NSArray *pingTextArray = [pingres componentsSeparatedByString:@"time="];
-            if (pingTextArray && pingTextArray.count == 2) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                                   NSString *delay = [pingTextArray[1] stringByReplacingOccurrencesOfString:@"ms" withString:@""];
-                                   [weakSelf.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
-                                   [weakSelf setChartData];
-                                   index++;
-                               });
-            }
+                               countdown -= 1;
+                           });
         }];
     }
 }
@@ -608,7 +632,7 @@
         [_downloadTask cancel];
     }
     if (_udpTesting) {
-        [TestUtils stopPing];
+        [_udpSocket pauseReceiving];
     }
     if (_traceTesting) {
         _traceroute.maxTtl = 0;
@@ -616,10 +640,61 @@
 
     _tcpPing = nil;
     _downloadTask = nil;
+    _udpSocket = nil;
     _traceroute = nil;
     _speedUpUtils = nil;
     [self dismissViewControllerAnimated:YES completion:^{
     }];
+}
+
+#pragma mark - GCDAsyncUdpSocketDelegate
+
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address {
+}
+
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *_Nullable)error {
+}
+
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag {
+    NSLog(@"发送信息成功");
+
+    NSTimeInterval d1 = [_udpStartDate timeIntervalSince1970] * 1000;
+    NSTimeInterval d2 = [[NSDate date] timeIntervalSince1970] * 1000;
+    NSTimeInterval dateDelay = d2 - d1;
+
+    NSString *udpDelay = [NSString stringWithFormat:@"%.3f", dateDelay];
+
+    NSInteger count = [_timeTextField.text integerValue];
+    if (_udpIndex == count) {
+        _udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, _udpLoss, udpDelay];
+    } else {
+        _udpTestString = [NSString stringWithFormat:@"64 bytes form 120.52.72.43: icmp_seq=0 ttl=0 time=%@ms", udpDelay];
+    }
+
+    [_resultTextArray addObject:_udpTestString];
+    NSArray *pingTextArray = [_udpTestString componentsSeparatedByString:@"time="];
+    if (pingTextArray && pingTextArray.count == 2) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *delay = [pingTextArray[1] stringByReplacingOccurrencesOfString:@"ms" withString:@""];
+            [self.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:self.udpIndex y:[delay doubleValue]]];
+            [self setChartData];
+            self.udpIndex++;
+        });
+    }
+}
+
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *_Nullable)error {
+    _udpLoss++;
+    NSLog(@"发送信息失败");
+}
+
+- (void)    udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
+          fromAddress:(NSData *)address
+    withFilterContext:(nullable id)filterContext {
+    NSLog(@"接收到%@的消息:%@", address, data);
+}
+
+- (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *_Nullable)error {
 }
 
 #pragma mark - ChartViewDelegate

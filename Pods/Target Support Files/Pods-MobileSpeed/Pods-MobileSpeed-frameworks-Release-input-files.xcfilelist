@@ -1,6 +1,7 @@
 ${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework
 ${BUILT_PRODUCTS_DIR}/Charts/Charts.framework
+${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework
 ${BUILT_PRODUCTS_DIR}/FCUUID/FCUUID.framework
 ${BUILT_PRODUCTS_DIR}/GBDeviceInfo/GBDeviceInfo.framework
 ${BUILT_PRODUCTS_DIR}/INTULocationManager/INTULocationManager.framework

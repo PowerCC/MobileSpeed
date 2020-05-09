@@ -8,6 +8,7 @@ target 'MobileSpeed' do
   pod 'AFNetworking'
   pod 'GBDeviceInfo'
   pod 'PhoneNetSDK'
+  pod 'CocoaAsyncSocket'
   pod 'INTULocationManager'
   pod 'Charts'
   pod 'JSONModel'

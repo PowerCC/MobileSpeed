@@ -10,6 +10,15 @@
 
 @implementation Tools
 
++ (NSString *)uuidString {
+    CFUUIDRef uuid_ref = CFUUIDCreate(NULL);
+    CFStringRef uuid_string_ref = CFUUIDCreateString(NULL, uuid_ref);
+    NSString *uuid = [NSString stringWithString:(__bridge NSString *)uuid_string_ref];
+    CFRelease(uuid_ref);
+    CFRelease(uuid_string_ref);
+    return [uuid lowercaseString];
+}
+
 + (void)showPrompt:(NSString *)text superView:(UIView *)superView numberOfLines:(NSInteger)numberOfLines afterDelay:(NSTimeInterval)afterDelay completion:(MBProgressHUDCompletionBlock)completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (text != nil) {
@@ -70,6 +79,39 @@
         return [defaults objectForKey:key];
     }
     return nil;
+}
+
++ (NSString *)intervalSinceNow:(NSDate *)theDate {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateStyle:NSDateFormatterMediumStyle];
+    [formatter setTimeStyle:NSDateFormatterShortStyle];
+    [formatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];// ----------设置你想要的格式,hh与HH的区别:分别表示12小时制,24小时制
+
+    NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"Asia/Beijing"];
+    [formatter setTimeZone:timeZone];
+
+    NSDate *datenow = [NSDate date];
+    long dd = (long)[datenow timeIntervalSince1970] - (long)[theDate timeIntervalSince1970];
+    NSString *timeString = [NSString stringWithFormat:@"%ld", dd / 3600];
+
+//    if (dd / 3600 < 1) {
+//        timeString = [NSString stringWithFormat:@"%ld", dd / 60];
+//        timeString = [NSString stringWithFormat:@"%@分钟前", timeString];
+//    }
+//
+//    if (dd / 3600 > 1 && dd / 86400 < 1) {
+//        timeString = [NSString stringWithFormat:@"%ld", dd / 3600];
+//        timeString = [NSString stringWithFormat:@"%@小时前", timeString];
+//    }
+//
+//    if (dd / 86400 > 1) {
+//        timeString = [NSString stringWithFormat:@"%ld", dd / 86400];
+//        timeString = [NSString stringWithFormat:@"%@天前", timeString];
+//    }
+
+    NSLog(@"=====%@", timeString);
+
+    return timeString;
 }
 
 @end
