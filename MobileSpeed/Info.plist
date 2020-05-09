@@ -28,13 +28,13 @@
 		<true/>
 	</dict>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>需要获取您的位置信息</string>
+	<string>需要获取您的位置信息来提供精准加速</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>需要获取您的位置信息</string>
+	<string>需要获取您的位置信息来提供精准加速</string>
 	<key>NSLocationUsageDescription</key>
-	<string>需要获取您的位置信息</string>
+	<string>需要获取您的位置信息来提供精准加速</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>需要获取您的位置信息</string>
+	<string>需要获取您的位置信息来提供精准加速</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
