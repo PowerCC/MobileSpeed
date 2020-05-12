@@ -26,10 +26,6 @@
 @property (strong, nonatomic) NSMutableArray *resultTextArray;
 
 @property (strong, nonatomic) SpeedUpUtils *speedUpUtils;
-@property (strong, nonatomic) PNTcpPing *tcpPing;
-@property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
-@property (strong, nonatomic) GCDAsyncUdpSocket *udpSocket;
-@property (strong, nonatomic) Traceroute *traceroute;
 
 @property (copy, nonatomic) NSString *udpTestString;
 @property (assign, nonatomic) NSInteger udpIndex;
@@ -55,8 +51,6 @@
     [super viewDidLoad];
 
     [self initUI];
-    [self initSpeedUpUtils];
-    [self initSocket];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -147,32 +141,24 @@
     textView.text = [NSString stringWithFormat:@"%@%@", text1, text2];
 }
 
-- (void)initSpeedUpUtils {
-    _speedUpUtils = [[SpeedUpUtils alloc] init];
-}
-
-- (void)initSocket {
-    _udpSocket = [[GCDAsyncUdpSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-}
-
-- (void)uploadResult:(NSString *)method testParams:(NSDictionary *)testPrarms {
-    DeviceInfoModel *infoModel = [DeviceInfoModel shared];
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    params[@"appId"] = @"zhongxin";
-    params[@"duration"] = self.timeTextField.text;
-    params[@"ispId"] = infoModel.ispId;
-    params[@"latitude"] = infoModel.latitude;
-    params[@"longitude"] = infoModel.longitude;
-    params[@"msgId"] = [Tools uuidString];
-    params[@"privateIp"] = infoModel.intranetIP;
-    params[@"publicIp"] = infoModel.extranetIP;
-    params[@"serverPort"] = self.portTextField.text;
-    params[@"testMethod"] = method;
-    params[@"userId"] = @"testUserId";
-    [params addEntriesFromDictionary:testPrarms];
-
-    [_speedUpUtils tracertReport:params];
-}
+//- (void)uploadResult:(NSString *)method testParams:(NSDictionary *)testPrarms {
+//    DeviceInfoModel *infoModel = [DeviceInfoModel shared];
+//    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+//    params[@"appId"] = @"zhongxin";
+//    params[@"duration"] = self.timeTextField.text;
+//    params[@"ispId"] = infoModel.ispId;
+//    params[@"latitude"] = infoModel.latitude;
+//    params[@"longitude"] = infoModel.longitude;
+//    params[@"msgId"] = [Tools uuidString];
+//    params[@"privateIp"] = infoModel.intranetIP;
+//    params[@"publicIp"] = infoModel.extranetIP;
+//    params[@"serverPort"] = self.portTextField.text;
+//    params[@"testMethod"] = method;
+//    params[@"userId"] = @"testUserId";
+//    [params addEntriesFromDictionary:testPrarms];
+//
+//    [_speedUpUtils tracertReport:params];
+//}
 
 - (void)formatTcpPingResultText:(UITextView *)textView {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -216,7 +202,7 @@
                                 params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%.f%%", ([loss doubleValue] / self.resultTextArray.count * 100)];
                                 params[@"tracertResult"] = @[textView.text];
 
-                                [self uploadResult:@"PING" testParams:params];
+                                [[TestUtils sharedInstance] uploadTestResult:@"PING" port:self.portTextField.text duration:self.timeTextField.text testParams:params];
                             }
                         }
                     }
@@ -283,7 +269,7 @@
                     params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%@%%", loss];
                     params[@"tracertResult"] = @[textView.text];
 
-                    [self uploadResult:@"UDP" testParams:params];
+                    [[TestUtils sharedInstance] uploadTestResult:@"UDP" port:self.portTextField.text duration:self.timeTextField.text testParams:params];
                 }
             }
         }
@@ -367,7 +353,7 @@
 - (IBAction)pingAction:(id)sender {
     if (_pingTesting) {
         _pingTesting = NO;
-        [_tcpPing stopTcpPing];
+        [[TestUtils sharedInstance] stopPing];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_timer invalidate];
@@ -404,7 +390,7 @@
                                if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.pingTesting = NO;
-                                   [weakSelf.tcpPing stopTcpPing];
+                                   [[TestUtils sharedInstance] stopPing];
                                    [weakSelf.timer invalidate];
                                }
                                countdown -= 1;
@@ -412,7 +398,7 @@
         }];
 
         __block double index = 1.0;
-        _tcpPing = [TestUtils tcpPing:target port:port count:1000 complete:^(NSMutableString *result) {
+        [[TestUtils sharedInstance] ping:target port:port count:1000 complete:^(NSMutableString *result) {
             NSLog(@"%@", result);
             if ([result containsString:@"TCP conn loss"]) {
                 [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
@@ -444,7 +430,7 @@
 - (IBAction)httpAction:(id)sender {
     if (_httpTesting) {
         _httpTesting = NO;
-        [_downloadTask cancel];
+        [[TestUtils sharedInstance] stopHttpDownloadFile];
         [self enabledAllButton];
     } else {
         _httpTesting = YES;
@@ -461,7 +447,7 @@
         _traceResultTextView.text = @"";
 
         WeakSelf;
-        _downloadTask = [_speedUpUtils downloadFile:netSpeed progress:^(NSProgress *_Nonnull downloadProgress) {
+        [[TestUtils sharedInstance] httpDownloadFile:netSpeed progress:^(NSProgress *_Nonnull downloadProgress) {
 //        NSLog(@"%lld\n", downloadProgress.totalUnitCount );
 //        NSLog(@"%lld\n", downloadProgress.completedUnitCount );
             NSString *progessString = [NSString stringWithFormat:@"文件已下载：%.f%%\n", downloadProgress.fractionCompleted * 100];
@@ -489,7 +475,7 @@
                                params[@"bandWidth"] = @"1.0";
                                params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
 
-                               [weakSelf uploadResult:@"HTTP" testParams:params];
+                               [[TestUtils sharedInstance] uploadTestResult:@"HTTP" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params];
 
                                [weakSelf enabledAllButton];
                            });
@@ -502,7 +488,7 @@
     _udpLoss = 0;
     if (_udpTesting) {
         _udpTesting = NO;
-        [TestUtils stopPing];
+        [[TestUtils sharedInstance] stopUdpTest];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_timer invalidate];
@@ -532,28 +518,19 @@
         _resultTextArray = [NSMutableArray arrayWithCapacity:0];
 
         WeakSelf;
-//        __block NSInteger index = 1;
-
-        NSError *error = nil;
-        [_udpSocket bindToPort:port error:&error];
-        if (error) {//监听错误打印错误信息
-            NSLog(@"error:%@", error);
-        } else {//监听成功则开始接收信息
-            [_udpSocket beginReceiving:&error];
-        }
 
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-                               [weakSelf.udpSocket sendData:[@"test" dataUsingEncoding:NSUTF8StringEncoding] toHost:target port:port withTimeout:-1 tag:0];
+                               [[TestUtils sharedInstance] udpTest:target port:port aDelegate:self];
 
                                weakSelf.udpStartDate = [NSDate date];
 
                                if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.udpTesting = NO;
-                                   [weakSelf.udpSocket pauseReceiving];
+                                   [[TestUtils sharedInstance] stopUdpTest];
                                    [weakSelf.timer invalidate];
                                    [weakSelf formatResultText:weakSelf.resultTextView];
                                }
@@ -567,7 +544,7 @@
 - (IBAction)traceAction:(id)sender {
     if (_traceTesting) {
         _traceTesting = NO;
-        _traceroute.maxTtl = 0;
+        [[TestUtils sharedInstance] stopTrace];
         [self enabledAllButton];
     } else if ([self ipCheck]) {
         _traceTesting = YES;
@@ -587,10 +564,9 @@
         NSString *port = [_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
 
         WeakSelf;
-        _traceroute = [Traceroute startTracerouteWithHost:target
-                                                     port:port
-                                                    queue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
-                                             stepCallback:^(TracerouteRecord *record) {
+        [[TestUtils sharedInstance] trace:target
+                                     port:port
+                             stepCallback:^(TracerouteRecord *record) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                NSString *text = [NSString stringWithFormat:@"%@%@\n", weakSelf.traceResultTextView.text, record];
                                weakSelf.traceResultTextView.text = text;
@@ -616,7 +592,7 @@
                                params[@"bandWidth"] = @"1.0";
                                params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
 
-                               [weakSelf uploadResult:@"TRACE" testParams:params];
+                               [[TestUtils sharedInstance] uploadTestResult:@"TRACE" port:port duration:weakSelf.timeTextField.text testParams:params];
 
                                [weakSelf enabledAllButton];
                            });
@@ -626,23 +602,18 @@
 
 - (IBAction)backAction:(id)sender {
     if (_pingTesting) {
-        [_tcpPing stopTcpPing];
+        [[TestUtils sharedInstance] stopPing];
     }
     if (_httpTesting) {
-        [_downloadTask cancel];
+        [[TestUtils sharedInstance] stopHttpDownloadFile];
     }
     if (_udpTesting) {
-        [_udpSocket pauseReceiving];
+        [[TestUtils sharedInstance] stopUdpTest];
     }
     if (_traceTesting) {
-        _traceroute.maxTtl = 0;
+        [[TestUtils sharedInstance] stopTrace];
     }
 
-    _tcpPing = nil;
-    _downloadTask = nil;
-    _udpSocket = nil;
-    _traceroute = nil;
-    _speedUpUtils = nil;
     [self dismissViewControllerAnimated:YES completion:^{
     }];
 }
