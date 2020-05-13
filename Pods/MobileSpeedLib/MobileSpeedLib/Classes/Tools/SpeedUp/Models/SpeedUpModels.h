@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <JSONModel/JSONModel.h>
+#import "Marco.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -6,18 +6,19 @@
 //  Copyright © 2020 邹程. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <PhoneNetSDK/PhoneNetSDK.h>
 #import "Marco.h"
 #import "Tools.h"
+#import "DeviceUtils.h"
 #import "DeviceInfoModel.h"
 #import "SpeedUpUtils.h"
-#import "GCDAsyncUdpSocket.h"
 #import "Traceroute.h"
+#import "SpeedUpModels.h"
+#import <PhoneNetSDK/PhoneNetSDK.h>
+#import <CocoaAsyncSocket/GCDAsyncUdpSocket.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^PingResultHandler)(NSString *_Nullable pingres, BOOL doingPing);
+typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 
 @interface TestUtils : NSObject
 
@@ -31,6 +32,12 @@ typedef void (^PingResultHandler)(NSString *_Nullable pingres, BOOL doingPing);
  实例
  */
 + (instancetype)sharedInstance;
+
+/**
+ 获取设备信息
+ @param infoHandler 设备信息DeviceInfoModel
+*/
+- (void)getDeviceInfo:(DeviceInfoHandler)infoHandler;
 
 /**
  ping探测
@@ -92,6 +99,23 @@ typedef void (^PingResultHandler)(NSString *_Nullable pingres, BOOL doingPing);
  @param duration 持续时间
 */
 - (void)uploadTestResult:(NSString *_Nonnull)method port:(NSString *)port duration:(NSString *)duration testParams:(NSDictionary *)testPrarms;
-@end
 
+/**
+ 加速
+ @param publicIP 公网IP
+ @param intranetIP 内网IP
+ @param ispId isPId
+ @param areaId 区域码
+ @param res SpeedUpCancelTecentGamesQoSModel（code，message）
+*/
+- (void)speedUp:(NSString *_Nonnull)publicIP intranetIP:(NSString *_Nonnull)intranetIP ispId:(NSString *_Nonnull)ispId areaId:(NSString *_Nonnull)areaId res:(nullable void (^)(SpeedUpApplyTecentGamesQoSModel *qoModel))res;
+
+/**
+ 取消加速
+ @param publicIP 公网IP
+ @param res SpeedUpCancelTecentGamesQoSModel（code，message）
+*/
+- (void)cancalSpeedUp:(NSString *_Nonnull)publicIP res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res;
+
+@end
 NS_ASSUME_NONNULL_END

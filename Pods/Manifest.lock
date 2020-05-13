@@ -27,20 +27,22 @@ PODS:
   - IQKeyboardManager (6.5.5)
   - JSONModel (1.8.0)
   - MBProgressHUD (1.2.0)
+  - MobileSpeedLib (0.1.1):
+    - AFNetworking
+    - CocoaAsyncSocket
+    - FCUUID
+    - GBDeviceInfo
+    - INTULocationManager
+    - JSONModel
+    - MBProgressHUD
+    - PhoneNetSDK
   - PhoneNetSDK (1.0.12)
   - UICKeyChainStore (2.1.2)
 
 DEPENDENCIES:
-  - AFNetworking
   - Charts
-  - CocoaAsyncSocket
-  - FCUUID
-  - GBDeviceInfo
-  - INTULocationManager
   - IQKeyboardManager
-  - JSONModel
-  - MBProgressHUD
-  - PhoneNetSDK
+  - MobileSpeedLib (from `https://github.com/PowerCC/MobileSpeedLib.git`)
 
 SPEC REPOS:
   trunk:
@@ -56,6 +58,15 @@ SPEC REPOS:
     - PhoneNetSDK
     - UICKeyChainStore
 
+EXTERNAL SOURCES:
+  MobileSpeedLib:
+    :git: https://github.com/PowerCC/MobileSpeedLib.git
+
+CHECKOUT OPTIONS:
+  MobileSpeedLib:
+    :commit: 8ccbd15bc3173f825b6d349e90734606634e0876
+    :git: https://github.com/PowerCC/MobileSpeedLib.git
+
 SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   Charts: 40a08591df1f8ad5c223ddedfb1a06da92f24f7c
@@ -66,9 +77,10 @@ SPEC CHECKSUMS:
   IQKeyboardManager: 3a8b9e603f8b0eeaf5f096a1f2b2cfcf121992ef
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
+  MobileSpeedLib: f2677e25eb2324d05a98861b8aff647f7383604c
   PhoneNetSDK: d0f24d066e8a7f2dd8e7c1a162d4c6910266def7
   UICKeyChainStore: 85db518bb1d294366d15ec9b92a416c4e670518f
 
-PODFILE CHECKSUM: 8b701f96e53bab8abc2230ae366cf841c05f7155
+PODFILE CHECKSUM: 699053dda9075c0b1a7848715e868921bcbca651
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1

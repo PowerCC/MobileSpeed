@@ -7,9 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <GBDeviceInfo/GBDeviceInfo.h>
-#import <PhoneNetSDK/PhoneNetSDK.h>
-#import "DeviceUtils.h"
 
 @interface ViewController : UIViewController
 

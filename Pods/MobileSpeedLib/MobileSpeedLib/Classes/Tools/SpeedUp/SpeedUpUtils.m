@@ -42,12 +42,14 @@
     return downloadTask;
 }
 
-- (void)getToken:(NSString *)urlString {
-    [self request:urlString method:@"POST" parameters:nil completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
+- (void)getToken:(NSString *)urlString res:(nullable void (^)(NSString *token))res {
+    [self request:urlString method:@"GET" parameters:nil completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         if (error) {
             NSLog(@"Error: %@", error);
+            res(nil);
         } else {
             NSLog(@"%@ %@", response, responseObject);
+            res([NSString stringWithFormat:@"%@", responseObject]);
         }
     }];
 }
@@ -65,7 +67,7 @@
     }];
 }
 
-- (void)applyTecentGamesQoS:(NSString *)ip publicIp:(NSString *)publicIp applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS {
+- (void)applyTecentGamesQoS:(NSString *)ip publicIp:(NSString *)publicIp applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS token:(NSString *)token {
     NSDictionary *ipDic1 = @{ @"DestinationIpAddress": @"223.111.237.4",
                               @"Direction": @"2",
                               @"MaximumDownStreamSpeedRate": @"50000",
@@ -95,7 +97,7 @@
                                  @"ResourceFeatureProperties": resourceFeaturePropertiesDic,
                                  @"ServiceId": @"Games100K",
                                  @"UserIdentifier": userIdentifierDic,
-                                 @"security_token": @"" };
+                                 @"security_token": token };
     NSLog(@"请求参数：%@", paramsDic);
     [self request:applyUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         if (error) {
@@ -124,7 +126,7 @@
 
 - (void)tracertReport:(NSDictionary *)paramsDic {
     if (paramsDic && paramsDic.count > 0) {
-        [self request:tracertReportUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+        [self request:tracertReportUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
             NSLog(@"%@ %@", response, responseObject);
             if (error) {
                 NSLog(@"Error: %@", error);
