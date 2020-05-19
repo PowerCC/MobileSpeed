@@ -64,7 +64,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   MobileSpeedLib:
-    :commit: 8ccbd15bc3173f825b6d349e90734606634e0876
+    :commit: 5c36cd44a9b98b5853da413123612f545170d3fe
     :git: https://github.com/PowerCC/MobileSpeedLib.git
 
 SPEC CHECKSUMS:
@@ -77,7 +77,7 @@ SPEC CHECKSUMS:
   IQKeyboardManager: 3a8b9e603f8b0eeaf5f096a1f2b2cfcf121992ef
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
-  MobileSpeedLib: f2677e25eb2324d05a98861b8aff647f7383604c
+  MobileSpeedLib: 277bb1c3d15dbef03bac66ec8ea75f5fd9059b2d
   PhoneNetSDK: d0f24d066e8a7f2dd8e7c1a162d4c6910266def7
   UICKeyChainStore: 85db518bb1d294366d15ec9b92a416c4e670518f
 

@@ -9,7 +9,6 @@
 #import "SpeedTestViewController.h"
 #import <MobileSpeedLib/MobileSpeedLib.h>
 //#import "Marco.h"
-//#import "Tools.h"
 //#import "TestUtils.h"
 //#import "SpeedUpUtils.h"
 //#import "Traceroute.h"
@@ -96,7 +95,7 @@
 //        }
         return [self portCheck];
     } else {
-        [Tools showPrompt:@"请输入网址或者IP地址" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+        [Tools showPrompt:@"请输入网址或者IP地址" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }
@@ -110,10 +109,10 @@
         if (match) {
             return [self timeCheck];
         } else {
-            [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+            [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
         }
     } else {
-        [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+        [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }
@@ -125,10 +124,10 @@
         if (time && time > 0) {
             return YES;
         } else {
-            [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+            [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
         }
     } else {
-        [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+        [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }

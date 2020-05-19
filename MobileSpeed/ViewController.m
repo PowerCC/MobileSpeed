@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "SpeedTestViewController.h"
 #import <MobileSpeedLib/MobileSpeedLib.h>
+#import "Tools.h"
 
 @interface ViewController ()
 
@@ -72,7 +73,7 @@
                 }
 
                 if (qoModel.ResultMessage) {
-                    [Tools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0 completion:nil];
+                    [Tools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
                 }
             }];
         } else {
@@ -84,12 +85,12 @@
                 }
 
                 if (qoModel.ResultMessage) {
-                    [Tools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0 completion:nil];
+                    [Tools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
                 }
             }];
         }
     } else {
-        [Tools showPrompt:@"无法获取区域信息" superView:self.view numberOfLines:1 afterDelay:3.0 completion:nil];
+        [Tools showPrompt:@"无法获取区域信息" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
 }
 
