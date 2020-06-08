@@ -10,7 +10,7 @@ target 'MobileSpeed' do
 #  pod 'PhoneNetSDK'
 #  pod 'CocoaAsyncSocket'
 #  pod 'INTULocationManager'
-  pod 'MobileSpeedLib', :git => 'https://github.com/PowerCC/MobileSpeedLib.git'
+#  pod 'MobileSpeedLib', :git => 'https://github.com/PowerCC/MobileSpeedLib.git'
   pod 'Charts'
 #  pod 'JSONModel'
 #  pod 'MBProgressHUD'

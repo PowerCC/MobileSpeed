@@ -16,7 +16,7 @@
 //#import "DeviceInfoModel.h"
 //#import "GCDAsyncUdpSocket.h"
 
-@interface SpeedTestViewController () <GCDAsyncUdpSocketDelegate, ChartViewDelegate>
+@interface SpeedTestViewController () <MSLGCDAsyncUdpSocketDelegate, ChartViewDelegate>
 
 @property (strong, nonatomic) UIColor *enabledColor;
 @property (strong, nonatomic) UIColor *disabledColor;
@@ -95,7 +95,7 @@
 //        }
         return [self portCheck];
     } else {
-        [Tools showPrompt:@"请输入网址或者IP地址" superView:self.view numberOfLines:1 afterDelay:3.0];
+        [MSLTools showPrompt:@"请输入网址或者IP地址" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }
@@ -109,10 +109,10 @@
         if (match) {
             return [self timeCheck];
         } else {
-            [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
+            [MSLTools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
         }
     } else {
-        [Tools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
+        [MSLTools showPrompt:@"请输入正确的端口号" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }
@@ -124,10 +124,10 @@
         if (time && time > 0) {
             return YES;
         } else {
-            [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
+            [MSLTools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
         }
     } else {
-        [Tools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
+        [MSLTools showPrompt:@"请输入正确的测试秒数" superView:self.view numberOfLines:1 afterDelay:3.0];
     }
     return NO;
 }
@@ -620,13 +620,13 @@
 
 #pragma mark - GCDAsyncUdpSocketDelegate
 
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address {
+- (void)udpSocket:(MSLGCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address {
 }
 
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *_Nullable)error {
+- (void)udpSocket:(MSLGCDAsyncUdpSocket *)sock didNotConnect:(NSError *_Nullable)error {
 }
 
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag {
+- (void)udpSocket:(MSLGCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag {
     NSLog(@"发送信息成功");
 
     NSTimeInterval d1 = [_udpStartDate timeIntervalSince1970] * 1000;
@@ -654,18 +654,18 @@
     }
 }
 
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *_Nullable)error {
+- (void)udpSocket:(MSLGCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *_Nullable)error {
     _udpLoss++;
     NSLog(@"发送信息失败");
 }
 
-- (void)    udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
+- (void)    udpSocket:(MSLGCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
           fromAddress:(NSData *)address
     withFilterContext:(nullable id)filterContext {
     NSLog(@"接收到%@的消息:%@", address, data);
 }
 
-- (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *_Nullable)error {
+- (void)udpSocketDidClose:(MSLGCDAsyncUdpSocket *)sock withError:(NSError *_Nullable)error {
 }
 
 #pragma mark - ChartViewDelegate

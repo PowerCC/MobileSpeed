@@ -193,35 +193,13 @@ open class YAxisRenderer: AxisRendererBase
             }
             
             // draw the grid
-            positions.forEach {
-                drawGridLine(context: context, position: $0)
-            }
+            positions.forEach { drawGridLine(context: context, position: $0) }
         }
 
         if yAxis.drawZeroLineEnabled
         {
             // draw zero line
             drawZeroLine(context: context)
-        }
-        
-
-        // 画红线
-        let from = yAxis.isDrawBottomYLabelEntryEnabled ? 0 : 1
-        let to = yAxis.isDrawTopYLabelEntryEnabled ? yAxis.entryCount : (yAxis.entryCount - 1)
-
-        for i in stride(from: from, to: to, by: 1)
-        {
-            let text = yAxis.getFormattedLabel(i)
-            
-            let p = transformedPositions()
-            
-            if let val = Double(text), val >= 80 {
-                context.setStrokeColor(UIColor.red.cgColor)
-                context.beginPath()
-                context.move(to: CGPoint(x: viewPortHandler.contentLeft, y: p[i].y))
-                context.addLine(to: CGPoint(x: viewPortHandler.contentRight, y: p[i].y))
-                context.strokePath()
-            }
         }
     }
     

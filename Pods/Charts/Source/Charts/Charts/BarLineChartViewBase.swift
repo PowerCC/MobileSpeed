@@ -210,9 +210,9 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
         // The renderers are responsible for clipping, to account for line-width center etc.
         if xAxis.drawGridLinesBehindDataEnabled
         {
-//            xAxisRenderer.renderGridLines(context: context)
+            xAxisRenderer.renderGridLines(context: context)
             leftYAxisRenderer.renderGridLines(context: context)
-//            rightYAxisRenderer.renderGridLines(context: context)
+            rightYAxisRenderer.renderGridLines(context: context)
         }
         
         if _xAxis.isEnabled && _xAxis.isDrawLimitLinesBehindDataEnabled
@@ -254,7 +254,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
         context.restoreGState()
         
         renderer.drawExtras(context: context)
-                
+        
         if _xAxis.isEnabled && !_xAxis.isDrawLimitLinesBehindDataEnabled
         {
             xAxisRenderer.renderLimitLines(context: context)
@@ -272,7 +272,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
         
         xAxisRenderer.renderAxisLabels(context: context)
         leftYAxisRenderer.renderAxisLabels(context: context)
-//        rightYAxisRenderer.renderAxisLabels(context: context)
+        rightYAxisRenderer.renderAxisLabels(context: context)
 
         if clipValuesToContentEnabled
         {
@@ -288,7 +288,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
             renderer.drawValues(context: context)
         }
 
-//        _legendRenderer.renderLegend(context: context)
+        _legendRenderer.renderLegend(context: context)
 
         drawDescription(context: context)
         

@@ -430,15 +430,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
                 context.setFillColor(dataSet.color(atIndex: j).cgColor)
             }
-
-            if let e = dataSet.entryForIndex(j % dataSet.entryCount), e.y >= 80 {
-                context.setFillColor(UIColor.red.cgColor)
-            } else {
-                context.setFillColor(dataSet.color(atIndex: 0).cgColor)
-            }
-                
+            
             context.fill(barRect)
-               
+            
             if drawBorder
             {
                 context.setStrokeColor(borderColor.cgColor)

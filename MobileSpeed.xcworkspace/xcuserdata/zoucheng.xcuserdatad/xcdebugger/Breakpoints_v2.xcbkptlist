@@ -7,81 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "FD7387DC-B498-474C-BB3C-D712DAA873E0"
+            uuid = "D709BF6F-22C7-4B20-94EE-E29994FD0AD7"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Pods/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
+            filePath = "../../Test/TempLib/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
-            landmarkName = "-getAreaInfo:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "FD7387DC-B498-474C-BB3C-D712DAA873E0 - f3135e702d1c113f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[SpeedUpUtils getAreaInfo:]"
-                  moduleName = "MobileSpeedLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zoucheng/Documents/Code/Git/MobileSpeed/Pods/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "58"
-                  endingLineNumber = "58"
-                  offsetFromSymbolStart = "60">
-               </Location>
-               <Location
-                  uuid = "FD7387DC-B498-474C-BB3C-D712DAA873E0 - ad3c3918006d5cad"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__28-[SpeedUpUtils getAreaInfo:]_block_invoke"
-                  moduleName = "MobileSpeedLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zoucheng/Documents/Code/Git/MobileSpeed/Pods/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "59"
-                  endingLineNumber = "59"
-                  offsetFromSymbolStart = "100">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6181645B-5A99-41E9-8762-3D5CCA740C27"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Pods/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "59"
-            endingLineNumber = "59"
-            landmarkName = "-getAreaInfo:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "24A2700F-3962-4E91-974F-491D464E6769"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Pods/MobileSpeedLib/MobileSpeedLib/Classes/Tools/SpeedUp/SpeedUpUtils.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
-            landmarkName = "-getAreaInfo:"
-            landmarkType = "7">
+            startingLineNumber = "201"
+            endingLineNumber = "201">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
