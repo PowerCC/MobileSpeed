@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:MobileSpeedLib.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:MobileSpeed.xcodeproj">
    </FileRef>
    <FileRef

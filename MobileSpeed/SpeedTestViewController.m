@@ -192,17 +192,6 @@
                                 NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / self.resultTextArray.count * 100)];
 
                                 textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
-
-                                NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                                params[@"totalPacketCount"] = [NSString stringWithFormat:@"%lu", (unsigned long)self.resultTextArray.count];
-                                params[@"averageDelayMillis"] = [NSString stringWithFormat:@"%@ms", avg];
-                                params[@"maxDelayMillis"] = [NSString stringWithFormat:@"%.3fms", maxTime];
-                                params[@"minDelayMillis"] = [NSString stringWithFormat:@"%.3fms", minTime];
-                                params[@"droppedPacketCount"] = [NSString stringWithFormat:@"%@", loss];
-                                params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%.f%%", ([loss doubleValue] / self.resultTextArray.count * 100)];
-                                params[@"tracertResult"] = @[textView.text];
-
-                                [[TestUtils sharedInstance] uploadTestResult:@"PING" port:self.portTextField.text duration:self.timeTextField.text testParams:params];
                             }
                         }
                     }
@@ -259,17 +248,25 @@
                     NSString *text6 = [NSString stringWithFormat:@"丢包率：%@%%\n", loss];
 
                     textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
+                    
+//                    NSMutableArray *timeNumberArray = [NSMutableArray arrayWithCapacity:0];
+//                    for (NSString *t in timeArray) {
+//                        double n = [t doubleValue];
+//                        [timeNumberArray addObject:[NSNumber numberWithDouble:n]];
+//                    }
+//
+//                    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+//                    params[@"totalPacketCount"] = [NSNumber numberWithInteger:[packets integerValue]];
+//                    params[@"allDelayMillis"] = timeNumberArray;
+//                    params[@"averageDelayMillis"] = [NSNumber numberWithDouble:[[delay stringByReplacingOccurrencesOfString:@"ms" withString:@""] doubleValue]];
+//                    params[@"maxDelayMillis"] = [NSNumber numberWithDouble:maxTime];
+//                    params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
+//                    params[@"droppedPacketCount"] = [NSNumber numberWithInteger:lossPacketArray.count];
+//                    params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
+//                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
+//
+//                    NSLog(@"udp prarms:%@", params);
 
-                    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                    params[@"totalPacketCount"] = packets;
-                    params[@"averageDelayMillis"] = delay;
-                    params[@"maxDelayMillis"] = [NSString stringWithFormat:@"%.3fms", maxTime];
-                    params[@"minDelayMillis"] = [NSString stringWithFormat:@"%.3fms", minTime];
-                    params[@"droppedPacketCount"] = [NSString stringWithFormat:@"%lu", (unsigned long)lossPacketArray.count];
-                    params[@"droppedPacketRatio"] = [NSString stringWithFormat:@"%@%%", loss];
-                    params[@"tracertResult"] = @[textView.text];
-
-                    [[TestUtils sharedInstance] uploadTestResult:@"UDP" port:self.portTextField.text duration:self.timeTextField.text testParams:params];
                 }
             }
         }
@@ -398,7 +395,7 @@
         }];
 
         __block double index = 1.0;
-        [[TestUtils sharedInstance] ping:target port:port count:1000 complete:^(NSMutableString *result) {
+        [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] ping:1000 complete:^(NSMutableString *result) {
             NSLog(@"%@", result);
             if ([result containsString:@"TCP conn loss"]) {
                 [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
@@ -465,17 +462,17 @@
                                weakSelf.httpTesting = NO;
                                weakSelf.traceResultTextView.text = [text copy];
 
-                               NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                               params[@"totalPacketCount"] = @"0";
-                               params[@"averageDelayMillis"] = @"0";
-                               params[@"maxDelayMillis"] = @"0";
-                               params[@"minDelayMillis"] = @"0";
-                               params[@"droppedPacketCount"] = @"0";
-                               params[@"droppedPacketRatio"] = @"0";
-                               params[@"bandWidth"] = @"1.0";
-                               params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
-
-                               [[TestUtils sharedInstance] uploadTestResult:@"HTTP" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params];
+//                               NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+//                               params[@"totalPacketCount"] = @"0";
+//                               params[@"averageDelayMillis"] = @"0";
+//                               params[@"maxDelayMillis"] = @"0";
+//                               params[@"minDelayMillis"] = @"0";
+//                               params[@"droppedPacketCount"] = @"0";
+//                               params[@"droppedPacketRatio"] = @"0";
+//                               params[@"bandWidth"] = @"1.0";
+//                               params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
+//
+//                               [[TestUtils sharedInstance] uploadTestResult:@"HTTP" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params];
 
                                [weakSelf enabledAllButton];
                            });
@@ -509,9 +506,7 @@
 
         [self initTestStartText:_resultTextView];
 
-        NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
         NSString *time = [_timeTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
-        NSInteger port = [[_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] integerValue];
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
@@ -523,8 +518,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-                               [[TestUtils sharedInstance] udpTest:target port:port aDelegate:self];
-
+                               [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] udpTest:weakSelf];
                                weakSelf.udpStartDate = [NSDate date];
 
                                if (countdown < 0) {
@@ -560,13 +554,8 @@
         [_traceTestResultView setHidden:NO];
         _traceResultTextView.text = @"";
 
-        NSString *target = [_ipTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
-        NSString *port = [_portTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
-
         WeakSelf;
-        [[TestUtils sharedInstance] trace:target
-                                     port:port
-                             stepCallback:^(TracerouteRecord *record) {
+        [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] trace:^(TracerouteRecord *record) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                NSString *text = [NSString stringWithFormat:@"%@%@\n", weakSelf.traceResultTextView.text, record];
                                weakSelf.traceResultTextView.text = text;
@@ -592,7 +581,9 @@
                                params[@"bandWidth"] = @"1.0";
                                params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
 
-                               [[TestUtils sharedInstance] uploadTestResult:@"TRACE" port:port duration:weakSelf.timeTextField.text testParams:params];
+                [[TestUtils sharedInstance] uploadTestResult:@"TRACE" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                    
+                }];
 
                                [weakSelf enabledAllButton];
                            });
@@ -637,7 +628,7 @@
 
     NSInteger count = [_timeTextField.text integerValue];
     if (_udpIndex == count) {
-        _udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, _udpLoss, udpDelay];
+        _udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, (long)_udpLoss, udpDelay];
     } else {
         _udpTestString = [NSString stringWithFormat:@"64 bytes form 120.52.72.43: icmp_seq=0 ttl=0 time=%@ms", udpDelay];
     }
