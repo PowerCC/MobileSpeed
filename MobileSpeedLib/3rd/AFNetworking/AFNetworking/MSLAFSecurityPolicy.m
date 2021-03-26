@@ -167,7 +167,7 @@ static NSArray *  MSLAFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust
 
 + (instancetype)defaultPolicy {
     MSLAFSecurityPolicy *securityPolicy = [[self alloc] init];
-    securityPolicy.SSLPinningMode = AFSSLPinningModeNone;
+    securityPolicy.SSLPinningMode = MSLAFSSLPinningModeNone;
 
     return securityPolicy;
 }
@@ -220,7 +220,7 @@ static NSArray *  MSLAFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust
 - (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust
                   forDomain:(NSString *)domain
 {
-    if (domain && self.allowInvalidCertificates && self.validatesDomainName && (self.SSLPinningMode == AFSSLPinningModeNone || [self.pinnedCertificates count] == 0)) {
+    if (domain && self.allowInvalidCertificates && self.validatesDomainName && (self.SSLPinningMode == MSLAFSSLPinningModeNone || [self.pinnedCertificates count] == 0)) {
         // https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NetworkingTopics/Articles/OverridingSSLChainValidationCorrectly.html
         //  According to the docs, you should only trust your provided certs for evaluation.
         //  Pinned certificates are added to the trust. Without pinned certificates,
@@ -242,14 +242,14 @@ static NSArray *  MSLAFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust
 
     SecTrustSetPolicies(serverTrust, (__bridge CFArrayRef)policies);
 
-    if (self.SSLPinningMode == AFSSLPinningModeNone) {
+    if (self.SSLPinningMode == MSLAFSSLPinningModeNone) {
         return self.allowInvalidCertificates || AFServerTrustIsValid(serverTrust);
     } else if (!self.allowInvalidCertificates && !AFServerTrustIsValid(serverTrust)) {
         return NO;
     }
 
     switch (self.SSLPinningMode) {
-        case AFSSLPinningModeCertificate: {
+        case MSLAFSSLPinningModeCertificate: {
             NSMutableArray *pinnedCertificates = [NSMutableArray array];
             for (NSData *certificateData in self.pinnedCertificates) {
                 [pinnedCertificates addObject:(__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData)];
@@ -271,7 +271,7 @@ static NSArray *  MSLAFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust
             
             return NO;
         }
-        case AFSSLPinningModePublicKey: {
+        case MSLAFSSLPinningModePublicKey: {
             NSUInteger trustedPublicKeyCount = 0;
             NSArray *publicKeys = MSLAFPublicKeyTrustChainForServerTrust(serverTrust);
 

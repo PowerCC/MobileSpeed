@@ -101,12 +101,12 @@
 @dynamic securityPolicy;
 
 - (void)setSecurityPolicy:(MSLAFSecurityPolicy *)securityPolicy {
-    if (securityPolicy.SSLPinningMode != AFSSLPinningModeNone && ![self.baseURL.scheme isEqualToString:@"https"]) {
+    if (securityPolicy.SSLPinningMode != MSLAFSSLPinningModeNone && ![self.baseURL.scheme isEqualToString:@"https"]) {
         NSString *pinningMode = @"Unknown Pinning Mode";
         switch (securityPolicy.SSLPinningMode) {
-            case AFSSLPinningModeNone:        pinningMode = @"AFSSLPinningModeNone"; break;
-            case AFSSLPinningModeCertificate: pinningMode = @"AFSSLPinningModeCertificate"; break;
-            case AFSSLPinningModePublicKey:   pinningMode = @"AFSSLPinningModePublicKey"; break;
+            case MSLAFSSLPinningModeNone:        pinningMode = @"MSLAFSSLPinningModeNone"; break;
+            case MSLAFSSLPinningModeCertificate: pinningMode = @"MSLAFSSLPinningModeCertificate"; break;
+            case MSLAFSSLPinningModePublicKey:   pinningMode = @"MSLAFSSLPinningModePublicKey"; break;
         }
         NSString *reason = [NSString stringWithFormat:@"A security policy configured with `%@` can only be applied on a manager with a secure base URL (i.e. https)", pinningMode];
         @throw [NSException exceptionWithName:@"Invalid Security Policy" reason:reason userInfo:nil];

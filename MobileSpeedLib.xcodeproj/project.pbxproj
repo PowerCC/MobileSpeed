@@ -153,8 +153,6 @@
 		82CEB2F0247F8EA5006DA307 /* MSLGCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 82CEB25A247F8EA5006DA307 /* MSLGCDAsyncSocket.m */; };
 		82CEB2F1247F8EA5006DA307 /* MSLGCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 82CEB25B247F8EA5006DA307 /* MSLGCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		82CEB2F2247F8EA5006DA307 /* MSLGCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 82CEB25C247F8EA5006DA307 /* MSLGCDAsyncSocket.h */; };
-		82CEB2F5247F8EA5006DA307 /* MSLMBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 82CEB260247F8EA5006DA307 /* MSLMBProgressHUD.m */; };
-		82CEB2F7247F8EA5006DA307 /* MSLMBProgressHUD.h in Headers */ = {isa = PBXBuildFile; fileRef = 82CEB262247F8EA5006DA307 /* MSLMBProgressHUD.h */; };
 		82CEB315247F8EFB006DA307 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 82CEB2FB247F8EFB006DA307 /* TestUtils.m */; };
 		82CEB316247F8EFB006DA307 /* NSString+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 82CEB2FC247F8EFB006DA307 /* NSString+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		82CEB317247F8EFB006DA307 /* MSLTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 82CEB2FD247F8EFB006DA307 /* MSLTools.m */; };
@@ -320,8 +318,6 @@
 		82CEB25A247F8EA5006DA307 /* MSLGCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSLGCDAsyncSocket.m; sourceTree = "<group>"; };
 		82CEB25B247F8EA5006DA307 /* MSLGCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSLGCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		82CEB25C247F8EA5006DA307 /* MSLGCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSLGCDAsyncSocket.h; sourceTree = "<group>"; };
-		82CEB260247F8EA5006DA307 /* MSLMBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSLMBProgressHUD.m; sourceTree = "<group>"; };
-		82CEB262247F8EA5006DA307 /* MSLMBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSLMBProgressHUD.h; sourceTree = "<group>"; };
 		82CEB2FB247F8EFB006DA307 /* TestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUtils.m; sourceTree = "<group>"; };
 		82CEB2FC247F8EFB006DA307 /* NSString+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Extension.h"; sourceTree = "<group>"; };
 		82CEB2FD247F8EFB006DA307 /* MSLTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSLTools.m; sourceTree = "<group>"; };
@@ -462,7 +458,6 @@
 				82CEB205247F8EA4006DA307 /* GBDeviceInfo */,
 				82CEB238247F8EA4006DA307 /* INTULocationManager */,
 				8220B41D248647CC0041CFCF /* JSONModel */,
-				82CEB25F247F8EA5006DA307 /* MBProgressHUD */,
 				82CEB1A4247F8EA3006DA307 /* PhoneNetSDK */,
 				82CEB24F247F8EA5006DA307 /* UICKeyChainStore */,
 			);
@@ -870,15 +865,6 @@
 			path = GCD;
 			sourceTree = "<group>";
 		};
-		82CEB25F247F8EA5006DA307 /* MBProgressHUD */ = {
-			isa = PBXGroup;
-			children = (
-				82CEB262247F8EA5006DA307 /* MSLMBProgressHUD.h */,
-				82CEB260247F8EA5006DA307 /* MSLMBProgressHUD.m */,
-			);
-			path = MBProgressHUD;
-			sourceTree = "<group>";
-		};
 		82CEB2F9247F8EFB006DA307 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -1031,7 +1017,6 @@
 				82CEB2E9247F8EA5006DA307 /* MSLFCUUID.h in Headers */,
 				82CEB274247F8EA5006DA307 /* UCNetworkService.h in Headers */,
 				82CEB2F2247F8EA5006DA307 /* MSLGCDAsyncSocket.h in Headers */,
-				82CEB2F7247F8EA5006DA307 /* MSLMBProgressHUD.h in Headers */,
 				82CEB277247F8EA5006DA307 /* PNPortScan.h in Headers */,
 				82CEB2AD247F8EA5006DA307 /* MSLGBDeviceInfo_Common.h in Headers */,
 				82CEB26A247F8EA5006DA307 /* PhoneTraceRoute.h in Headers */,
@@ -1192,7 +1177,6 @@
 				82CEB27E247F8EA5006DA307 /* PNetReachability.m in Sources */,
 				8220B43B248647CC0041CFCF /* MSLJSONModel.m in Sources */,
 				82CEB2F0247F8EA5006DA307 /* MSLGCDAsyncSocket.m in Sources */,
-				82CEB2F5247F8EA5006DA307 /* MSLMBProgressHUD.m in Sources */,
 				82CEB2D0247F8EA5006DA307 /* MSLAFHTTPSessionManager.m in Sources */,
 				82CEB275247F8EA5006DA307 /* UCNetworkService.mm in Sources */,
 				82CEB28C247F8EA5006DA307 /* MSLPhoneNetManager.mm in Sources */,

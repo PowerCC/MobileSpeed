@@ -395,7 +395,8 @@
         }];
 
         __block double index = 1.0;
-        [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] ping:1000 complete:^(NSMutableString *result) {
+        TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text];
+        [tu ping:1000 complete:^(NSMutableString *result) {
             NSLog(@"%@", result);
             if ([result containsString:@"TCP conn loss"]) {
                 [weakSelf formatTcpPingResultText:weakSelf.resultTextView];

@@ -10,6 +10,7 @@
 #import "MSLGBDeviceInfo.h"
 #import "MSLFCUUID.h"
 #import "MSLINTULocationManager.h"
+#import "PhonePingService.h"
 
 @interface TestUtils () <MSLGCDAsyncUdpSocketDelegate>
 @property (copy, nonatomic) NSString *testHost;
@@ -26,20 +27,30 @@
 @property (weak, nonatomic) id<MSLGCDAsyncUdpSocketDelegate> updDelegate;
 
 @property (strong, nonatomic) NSMutableArray *pingResultTextArray;
+@property (strong, nonatomic) NSMutableArray *tcpPingResultTextArray;
 @property (strong, nonatomic) NSMutableArray *udpResultTextArray;
+
+@property (copy, nonatomic) NSString *appId;
+@property (copy, nonatomic) NSString *userId;
+@property (copy, nonatomic) NSString *businessId;
+@property (copy, nonatomic) NSString *businessState;
 @end
 
 @implementation TestUtils
 
 static TestUtils *testUtils = nil;
 
-+ (instancetype)sharedInstance {
++ (instancetype)sharedInstance:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState {
     if (testUtils == nil) {
         testUtils = [[TestUtils alloc]init];
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
 
         if (testUtils.pingResultTextArray == nil) {
             testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+        }
+
+        if (testUtils.tcpPingResultTextArray == nil) {
+            testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
         }
 
         if (testUtils.udpResultTextArray == nil) {
@@ -49,22 +60,33 @@ static TestUtils *testUtils = nil;
         testUtils.testHost = defaultIp;
         testUtils.testPort = defaultPort;
         testUtils.testDuration = @"10";
+
+        testUtils.appId = appId;
+        testUtils.userId = userId;
+        testUtils.businessId = businessId;
+        testUtils.businessState = businessState;
     }
 
     return testUtils;
 }
 
-+ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration {
++ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState {
     if (testUtils == nil) {
         testUtils = [[TestUtils alloc]init];
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
         testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+        testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
         testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
     }
 
     testUtils.testHost = [host stringByReplacingOccurrencesOfString:@" " withString:@""];
     testUtils.testPort = [port stringByReplacingOccurrencesOfString:@" " withString:@""];
     testUtils.testDuration = [duration stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+    testUtils.appId = appId;
+    testUtils.userId = userId;
+    testUtils.businessId = businessId;
+    testUtils.businessState = businessState;
 
     return testUtils;
 }
@@ -92,40 +114,125 @@ static TestUtils *testUtils = nil;
         infoModel.location = model.regionName;
         infoModel.ispId = model.ispId;
 
-        MSLINTULocationManager *locMgr = [MSLINTULocationManager sharedInstance];
-        [locMgr requestLocationWithDesiredAccuracy:INTULocationAccuracyCity
-                                           timeout:10.0
-                              delayUntilAuthorized:YES
-                                             block:^(CLLocation *currentLocation, INTULocationAccuracy achievedAccuracy, INTULocationStatus status) {
-            if (status == INTULocationStatusSuccess) {
-                NSString *la = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
-                NSString *lo = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
-                infoModel.latitude = la;
-                infoModel.longitude = lo;
-            } else if (status == INTULocationStatusTimedOut) {
-                infoModel.latitude = @"";
-                infoModel.longitude = @"";
-            } else {
-                infoModel.latitude = @"";
-                infoModel.longitude = @"";
+//        MSLINTULocationManager *locMgr = [MSLINTULocationManager sharedInstance];
+//        [locMgr requestLocationWithDesiredAccuracy:INTULocationAccuracyCity
+//                                           timeout:10.0
+//                              delayUntilAuthorized:YES
+//                                             block:^(CLLocation *currentLocation, INTULocationAccuracy achievedAccuracy, INTULocationStatus status) {
+//                                                 if (status == INTULocationStatusSuccess) {
+//                                                     NSString *la = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
+//                                                     NSString *lo = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
+//                                                     infoModel.latitude = la;
+//                                                     infoModel.longitude = lo;
+//                                                 } else if (status == INTULocationStatusTimedOut) {
+//                                                     infoModel.latitude = @"";
+//                                                     infoModel.longitude = @"";
+//                                                 } else {
+//                                                     infoModel.latitude = @"";
+//                                                     infoModel.longitude = @"";
+//                                                 }
+//
+//                                                 if (infoHandler) {
+//                                                     infoHandler(infoModel);
+//                                                 }
+//                                             }];
+
+        if (infoHandler) {
+            infoHandler(infoModel);
+        }
+    }];
+}
+
+- (void)formatPingResultText {
+    WeakSelf;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (weakSelf.pingResultTextArray && weakSelf.pingResultTextArray.count > 0) {
+            NSMutableArray *lossPacketArray = [NSMutableArray arrayWithCapacity:0];
+            NSMutableArray *timeArray = [NSMutableArray arrayWithCapacity:0];
+            NSString *finalPingText = @"";
+
+            for (NSString *pingText in weakSelf.pingResultTextArray) {
+                if ([pingText containsString:@"0 bytes form"]) {
+                    [lossPacketArray addObject:pingText];
+                } else if ([pingText containsString:@"packets transmitted"]) {
+                    finalPingText = pingText;
+                } else if ([pingText containsString:@"packets transmitted"] == NO) {
+                    NSArray *tempArray = [pingText componentsSeparatedByString:@"time="];
+                    if (tempArray) {
+                        NSString *tempTime = tempArray.lastObject;
+                        if (tempTime) {
+                            NSString *time = [tempTime stringByReplacingOccurrencesOfString:@"ms" withString:@""];
+                            if (time) {
+                                [timeArray addObject:time];
+                            }
+                        }
+                    }
+                }
             }
 
-            if (infoHandler) {
-                infoHandler(infoModel);
+            //最大值
+            double maxTime = [[timeArray valueForKeyPath:@"@max.doubleValue"] doubleValue];
+
+            //最小值
+            double minTime = [[timeArray valueForKeyPath:@"@min.doubleValue"] doubleValue];
+
+            if (finalPingText) {
+                NSArray *finalPingTextArray = [finalPingText componentsSeparatedByString:@" , "];
+                if (finalPingTextArray && finalPingTextArray.count == 4) {
+                    NSString *packets = [finalPingTextArray[0] stringByReplacingOccurrencesOfString:@" packets transmitted" withString:@""];
+                    NSString *delay = [finalPingTextArray[2] stringByReplacingOccurrencesOfString:@"delay:" withString:@""];
+                    NSString *loss = [finalPingTextArray[1] stringByReplacingOccurrencesOfString:@"loss:" withString:@""];
+                    NSString *text1 = [NSString stringWithFormat:@"发包数：%@\n", packets];
+                    NSString *text2 = [NSString stringWithFormat:@"平均时延：%@\n", delay];
+                    NSString *text3 = [NSString stringWithFormat:@"最高时延：%.3fms\n", maxTime];
+                    NSString *text4 = [NSString stringWithFormat:@"最低时延：%.3fms\n", minTime];
+                    NSString *text5 = [NSString stringWithFormat:@"丢包次数：%lu\n", (unsigned long)lossPacketArray.count];
+                    NSString *text6 = [NSString stringWithFormat:@"丢包率：%@%%\n", loss];
+
+                    NSMutableArray *timeNumberArray = [NSMutableArray arrayWithCapacity:0];
+                    for (NSString *t in timeArray) {
+                        double n = [t doubleValue];
+                        [timeNumberArray addObject:[NSNumber numberWithDouble:n]];
+                    }
+
+                    MSLPhoneNetManager *phoneNetManager = [MSLPhoneNetManager shareInstance];
+
+                    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                    params[@"networkType"] = phoneNetManager.netGetNetworkInfo.deviceNetInfo.netType;
+                    params[@"totalPacketCount"] = [NSNumber numberWithInteger:[packets integerValue]];
+                    params[@"allDelayMillis"] = timeNumberArray;
+                    params[@"averageDelayMillis"] = [NSNumber numberWithDouble:[[delay stringByReplacingOccurrencesOfString:@"ms" withString:@""] doubleValue]];
+                    params[@"maxDelayMillis"] = [NSNumber numberWithDouble:maxTime];
+                    params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
+                    params[@"droppedPacketCount"] = [NSNumber numberWithInteger:lossPacketArray.count];
+                    params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
+                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
+
+                    NSLog(@"ping params:%@", params);
+
+                    [weakSelf uploadTestResult:@"PING" port:@"" duration:weakSelf.testDuration testParams:params completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
+                        [weakSelf.pingResultTextArray removeAllObjects];
+                    }];
+                }
+            } else {
+                [weakSelf.pingResultTextArray removeAllObjects];
             }
-        }];
-    }];
+        } else {
+            NSLog(@"\nPingResultTextArray Empty\n");
+            [weakSelf.pingResultTextArray removeAllObjects];
+        }
+    });
 }
 
 - (void)formatTcpPingResultText {
     WeakSelf;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (weakSelf.pingResultTextArray.count > 0) {
-            NSString *text = weakSelf.pingResultTextArray[weakSelf.pingResultTextArray.count - 1];
+        if (weakSelf.tcpPingResultTextArray && weakSelf.tcpPingResultTextArray.count > 0) {
+            NSString *text = weakSelf.tcpPingResultTextArray[weakSelf.tcpPingResultTextArray.count - 1];
             if (text && text.length > 0) {
                 if ([text containsString:@"connect failed"] || [text containsString:@"DNS error"]) {
 //                    textView.text = @"测试失败，网络连接错误！";
-                    [weakSelf.pingResultTextArray removeAllObjects];
+                    [weakSelf.tcpPingResultTextArray removeAllObjects];
                 } else {
                     NSArray *pingTextArray = [text componentsSeparatedByString:@"TCP conn "];
                     if (pingTextArray && pingTextArray.count >= 2) {
@@ -143,12 +250,12 @@ static TestUtils *testUtils = nil;
                                 //最小值
                                 double minTime = [min doubleValue];
 
-                                NSString *text1 = [NSString stringWithFormat:@"发包数：%lu\n", (unsigned long)weakSelf.pingResultTextArray.count];
+                                NSString *text1 = [NSString stringWithFormat:@"发包数：%lu\n", (unsigned long)weakSelf.tcpPingResultTextArray.count];
                                 NSString *text2 = [NSString stringWithFormat:@"平均时延：%@ms\n", avg];
                                 NSString *text3 = [NSString stringWithFormat:@"最高时延：%.3fms\n", maxTime];
                                 NSString *text4 = [NSString stringWithFormat:@"最低时延：%.3fms\n", minTime];
                                 NSString *text5 = [NSString stringWithFormat:@"丢包次数：%@\n", loss];
-                                NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / weakSelf.pingResultTextArray.count * 100)];
+                                NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / weakSelf.tcpPingResultTextArray.count * 100)];
 
                                 NSMutableArray *timeArray = [NSMutableArray arrayWithCapacity:0];
                                 NSArray *tempArray = [text componentsSeparatedByString:@"\n"];
@@ -174,43 +281,44 @@ static TestUtils *testUtils = nil;
 
                                 NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
                                 params[@"networkType"] = phoneNetManager.netGetNetworkInfo.deviceNetInfo.netType;
-                                params[@"totalPacketCount"] = [NSNumber numberWithInteger:weakSelf.pingResultTextArray.count];
+                                params[@"totalPacketCount"] = [NSNumber numberWithInteger:weakSelf.tcpPingResultTextArray.count];
                                 params[@"allDelayMillis"] = timeNumberArray;
                                 params[@"averageDelayMillis"] = [NSNumber numberWithDouble:[avg doubleValue]];
                                 params[@"maxDelayMillis"] = [NSNumber numberWithDouble:maxTime];
                                 params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
                                 params[@"droppedPacketCount"] = [NSNumber numberWithDouble:[loss doubleValue]];
-                                params[@"droppedPacketRatio"] = [NSNumber numberWithInteger:([loss doubleValue] / weakSelf.pingResultTextArray.count * 100)];
+                                params[@"droppedPacketRatio"] = [NSNumber numberWithInteger:([loss doubleValue] / weakSelf.tcpPingResultTextArray.count * 100)];
                                 params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 
-                                NSLog(@"ping prarms:%@", params);
+                                NSLog(@"tcpping params:%@", params);
 
                                 [weakSelf uploadTestResult:@"PING" port:weakSelf.testPort duration:weakSelf.testDuration testParams:params completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
-                                    [weakSelf.pingResultTextArray removeAllObjects];
+                                    [weakSelf.tcpPingResultTextArray removeAllObjects];
                                 }];
                             } else {
-                                [weakSelf.pingResultTextArray removeAllObjects];
+                                [weakSelf.tcpPingResultTextArray removeAllObjects];
                             }
                         } else {
-                            [weakSelf.pingResultTextArray removeAllObjects];
+                            [weakSelf.tcpPingResultTextArray removeAllObjects];
                         }
                     } else {
-                        [weakSelf.pingResultTextArray removeAllObjects];
+                        [weakSelf.tcpPingResultTextArray removeAllObjects];
                     }
                 }
             } else {
-                [weakSelf.pingResultTextArray removeAllObjects];
+                [weakSelf.tcpPingResultTextArray removeAllObjects];
             }
         } else {
-            NSLog(@"\nPingResultTextArray Empty\n");
+            NSLog(@"\nTcpPingResultTextArray Empty\n");
+            [weakSelf.tcpPingResultTextArray removeAllObjects];
         }
     });
 }
 
-- (void)formatResultText {
+- (void)formatUdpResultText {
     WeakSelf;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (weakSelf.udpResultTextArray.count > 0) {
+        if (weakSelf.udpResultTextArray && weakSelf.udpResultTextArray.count > 0) {
             NSMutableArray *lossPacketArray = [NSMutableArray arrayWithCapacity:0];
             NSMutableArray *timeArray = [NSMutableArray arrayWithCapacity:0];
 
@@ -270,7 +378,7 @@ static TestUtils *testUtils = nil;
                     params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
                     params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 
-                    NSLog(@"udp prarms:%@", params);
+                    NSLog(@"udp params:%@", params);
 
                     [weakSelf uploadTestResult:@"UDP" port:weakSelf.testPort duration:weakSelf.testDuration testParams:params completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
                         weakSelf.udpIndex = 0;
@@ -285,28 +393,61 @@ static TestUtils *testUtils = nil;
             }
         } else {
             NSLog(@"\nUdpResultTextArray Empty\n");
+            [weakSelf.udpResultTextArray removeAllObjects];
         }
     });
 }
 
-- (void)ping:(NSUInteger)count complete:(MSLPNTcpPingHandler _Nonnull)complete {
-    NSInteger port = [self.testPort integerValue];
-    _tcpPing = [MSLPNTcpPing start:self.testHost port:port count:count complete:^(NSMutableString *result) {
-        [self.pingResultTextArray addObject:result];
-        complete(result);
+- (void)ping:(NSUInteger)count state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete {
+    self.businessState = state;
+    [[PhonePingService shareInstance] startPingHost:self.testHost packetCount:count resultHandler:^(NSString *_Nullable pingres) {
+        [self.pingResultTextArray addObject:pingres];
+        if (complete) {
+            complete(pingres);
+        }
     }];
 }
 
 - (void)stopPing {
+    if ([[PhonePingService shareInstance] uIsPing]) {
+        [[PhonePingService shareInstance] uStopPing];
+    }
+
+    NSLog(@"\nPingResultTextArray Count:%lu\n", (unsigned long)_pingResultTextArray.count);
+
+    int64_t delayInSeconds = 1.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
+        [self formatPingResultText];
+    });
+}
+
+- (void)tcpPing:(NSUInteger)count state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete {
+    self.businessState = state;
+    NSInteger port = [self.testPort integerValue];
+    _tcpPing = [MSLPNTcpPing start:self.testHost port:port count:count complete:^(NSMutableString *result) {
+        [self.tcpPingResultTextArray addObject:result];
+        complete(result);
+    }];
+}
+
+- (void)stopTcpPing {
     if (_tcpPing) {
         [_tcpPing stopTcpPing];
     }
 
-    NSLog(@"\nPingResultTextArray Count:%lu\n", (unsigned long)_pingResultTextArray.count);
-    [self performSelector:@selector(formatTcpPingResultText) withObject:nil afterDelay:1];
+    NSLog(@"\nTcpPingResultTextArray Count:%lu\n", (unsigned long)_tcpPingResultTextArray.count);
+
+    int64_t delayInSeconds = 1.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
+        [self formatTcpPingResultText];
+    });
 }
 
-- (void)httpDownloadFile:(NSString *)fileUrl progress:(void (^)(NSProgress *downloadProgress))downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler {
+- (void)httpDownloadFile:(NSString *)fileUrl state:(NSString *)state progress:(void (^)(NSProgress *downloadProgress))downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler {
+    self.businessState = state;
+
     if (_speedUpUtils == nil) {
         _speedUpUtils = [[SpeedUpUtils alloc] init];
     }
@@ -344,7 +485,7 @@ static TestUtils *testUtils = nil;
 - (void)stopUdpTest {
     [_udpSocket pauseReceiving];
     NSLog(@"\nUdpResultTextArray Count:%lu\n", (unsigned long)_udpResultTextArray.count);
-    [self formatResultText];
+    [self formatUdpResultText];
 }
 
 - (void)trace:(TracerouteStepCallback)stepCallback finish:(TracerouteFinishCallback)finish {
@@ -359,7 +500,7 @@ static TestUtils *testUtils = nil;
     if (_speedUpUtils) {
         DeviceInfoModel *infoModel = [DeviceInfoModel shared];
         NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-        params[@"appId"] = @"zhongxin";
+        params[@"appId"] = self.appId;
         params[@"duration"] = duration;
         params[@"ispId"] = infoModel.ispId;
         params[@"latitude"] = infoModel.latitude;
@@ -369,7 +510,9 @@ static TestUtils *testUtils = nil;
         params[@"publicIp"] = infoModel.publicIP;
         params[@"serverPort"] = port;
         params[@"testMethod"] = method;
-        params[@"userId"] = @"testUserId";
+        params[@"userId"] = self.userId;
+        params[@"businessId"] = self.businessId;
+        params[@"businessState"] = self.businessState;
         [params addEntriesFromDictionary:testPrarms];
 
         [_speedUpUtils tracertReport:params completionHandler:completionHandler];
@@ -408,8 +551,8 @@ static TestUtils *testUtils = nil;
                                                 intranetIp:intranetIp
                                                   publicIp:publicIp
                                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
-                    res(model);
-                } token:token];
+                                           res(model);
+                                       } token:token];
             }];
         } else {
             [_speedUpUtils getToken:getCmGuandongTokenUrl res:^(NSString *_Nonnull token) {
@@ -420,8 +563,8 @@ static TestUtils *testUtils = nil;
                                                 intranetIp:intranetIp
                                                   publicIp:publicIp
                                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
-                    res(model);
-                } token:token];
+                                           res(model);
+                                       } token:token];
             }];
         }
     } else {
@@ -433,8 +576,8 @@ static TestUtils *testUtils = nil;
                                 intranetIp:intranetIp
                                   publicIp:publicIp
                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
-            res(model);
-        } token:@""];
+                           res(model);
+                       } token:@""];
     }
 }
 
@@ -449,8 +592,8 @@ static TestUtils *testUtils = nil;
                                   partnerId:partnerId
                                    publicIp:publicIp
                        cancelTecentGamesQoS:^(SpeedUpCancelTecentGamesQoSModel *_Nullable model) {
-            res(model);
-        }];
+                           res(model);
+                       }];
     }
 }
 

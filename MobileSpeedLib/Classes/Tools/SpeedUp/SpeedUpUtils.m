@@ -16,7 +16,7 @@
 - (void)request:(NSString *)urlString method:(NSString *)method parameters:(nullable id)parameters completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler {
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     MSLAFURLSessionManager *manager = [[MSLAFURLSessionManager alloc] initWithSessionConfiguration:configuration];
-    
+
 //    if ([method isEqualToString:@"GET"]) {
 //        MSLAFHTTPResponseSerializer *responseSerializer = (MSLAFHTTPResponseSerializer *)manager.responseSerializer;
 //        responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/plain" "text/html", @"application/octet-stream", @"application/json", @"text/json", nil];
@@ -50,7 +50,8 @@
             res(nil);
         } else {
             NSLog(@"%@ %@", response, responseObject);
-            res([NSString stringWithFormat:@"%@", responseObject]);
+            SpeedUpTokenModel *model = [[SpeedUpTokenModel alloc] initWithDictionary:responseObject error:nil];
+            res(model.result);
         }
     }];
 }
@@ -93,7 +94,19 @@
     NSMutableArray *ipDics = [[NSMutableArray alloc] init];
 
     for (NSString *ip in destAddresses) {
-        NSDictionary *ipDic = @{ @"DestinationIpAddress": ip,
+        NSString *destinationIpAddress = ip;
+        NSString *destinationPort = @"";
+
+        if ([ip containsString:@":"]) {
+            NSArray *ipstrArray = [ip componentsSeparatedByString:@":"];
+            if (ipstrArray != nil && [ipstrArray count] == 2) {
+                destinationIpAddress = ipstrArray[0];
+                destinationPort = ipstrArray[1];
+            }
+        }
+
+        NSDictionary *ipDic = @{ @"DestinationIpAddress": destinationIpAddress,
+                                 @"DestinationPort": destinationPort,
                                  @"Direction": @"2",
                                  @"MaximumDownStreamSpeedRate": [NSString stringWithFormat:@"%lu", (unsigned long)qosSreamSpeed.maxDown],
                                  @"MaximumUpStreamSpeedRate": [NSString stringWithFormat:@"%lu", (unsigned long)qosSreamSpeed.maxUp],
@@ -106,13 +119,13 @@
     NSDictionary *resourceFeaturePropertiesDic = @{ @"FlowProperties": ipDics,
                                                     @"MinimumDownStreamSpeedRate":  [NSString stringWithFormat:@"%lu", (unsigned long)qosSreamSpeed.minDown],
                                                     @"MinimumUpStreamSpeedRate":  [NSString stringWithFormat:@"%lu", (unsigned long)qosSreamSpeed.minUp],
-                                                    @"Priority": @"1",
+                                                    @"Priority": @"15",
                                                     @"Type": @"2" };
 
     NSDictionary *userIdentifierDic = @{ @"IP": intranetIp,
                                          @"PublicIP": publicIp };
 
-    NSDictionary *paramsDic = @{ @"Duration": @"3600",
+    NSDictionary *paramsDic = @{ @"Duration": [NSNumber numberWithInteger:3450],
                                  @"OTTchargingId": @"a1234567890",
                                  @"Partner_ID": partnerId,
                                  @"ResourceFeatureProperties": @[resourceFeaturePropertiesDic],

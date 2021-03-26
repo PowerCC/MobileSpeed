@@ -7,6 +7,9 @@
 //
 
 #import "SpeedUpModels.h"
+@implementation SpeedUpTokenModel : MSLJSONModel
+
+@end
 
 @implementation SpeedUpAreaInfoModel
 

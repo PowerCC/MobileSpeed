@@ -34,17 +34,25 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 @property (strong, nonatomic) Traceroute *traceroute;
 
 /**
-实例
+ 实例
+ @param appId App标识
+ @param userId 用户标识
+ @param businessId businessId
+ @param businessState businessState
  */
-+ (instancetype)sharedInstance;
++ (instancetype)sharedInstance:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState;
 
 /**
  实例
  @param host 测试网址或IP
  @param port 测试端口号
  @param duration 测试时长
+ @param appId App标识
+ @param userId 用户标识
+ @param businessId businessId
+ @param businessState businessState
  */
-+ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration;
++ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState;
 
 /**
  获取设备信息
@@ -55,8 +63,9 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 /**
  ping探测
  @param count 测试次数
+ @param state 加速状态 1加速前 2加速后
 */
-- (void)ping:(NSUInteger)count complete:(MSLPNTcpPingHandler _Nonnull)complete;
+- (void)ping:(NSUInteger)count state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete;
 
 /**
  停止ping探测
@@ -64,12 +73,25 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 - (void)stopPing;
 
 /**
+ tcpping探测
+ @param count 测试次数
+ @param state 加速状态 1加速前 2加速后
+*/
+- (void)tcpPing:(NSUInteger)count state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete;
+
+/**
+ 停止tcpping探测
+ */
+- (void)stopTcpPing;
+
+/**
  http探测（文件下载）
  @param fileUrl 文件地址
+ @param state 加速状态 1加速前 2加速后
  @param downloadProgressBlock 下载进度
  @param completionHandler 结果Handler
 */
-- (void)httpDownloadFile:(NSString *_Nonnull)fileUrl progress:(void (^)(NSProgress *downloadProgress))downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler;
+- (void)httpDownloadFile:(NSString *_Nonnull)fileUrl state:(NSString *)state progress:(void (^)(NSProgress *downloadProgress))downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler;
 
 /**
  停止http探测（文件下载）
@@ -79,8 +101,9 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 /**
  udp检测
  @param aDelegate GCDAsyncUdpSocketDelegate 代理
+ @param state 加速状态 1加速前 2加速后
 */
-- (void)udpTest:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate;
+- (void)udpTest:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state;
 
 /**
  停止udp探测（文件下载）

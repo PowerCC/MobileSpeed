@@ -7,7 +7,7 @@
 //
 
 #import "SceneDelegate.h"
-#import <IQKeyboardManager/IQKeyboardManager.h>
+//#import <IQKeyboardManager/IQKeyboardManager.h>
 
 @interface SceneDelegate ()
 

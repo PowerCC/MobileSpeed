@@ -12,10 +12,10 @@
 		825B5C8B247FAC9200F25260 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 825B5C8A247FAC8A00F25260 /* libc++.tbd */; };
 		82AE4520245138E300DEFD98 /* SpeedTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 82AE451F245138E300DEFD98 /* SpeedTestViewController.m */; };
 		82CEB33F247F9EC6006DA307 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB33E247F9EC6006DA307 /* CFNetwork.framework */; };
-		82CEB341247F9ECD006DA307 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB340247F9ECD006DA307 /* QuartzCore.framework */; };
-		82CEB343247F9EDE006DA307 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB342247F9EDE006DA307 /* Security.framework */; };
 		82CEB345247F9EEA006DA307 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB344247F9EEA006DA307 /* CoreGraphics.framework */; };
 		82CEB347247F9EF8006DA307 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB346247F9EF8006DA307 /* Foundation.framework */; };
+		82E5FD2A2607514300FE1296 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB342247F9EDE006DA307 /* Security.framework */; };
+		82E5FD2B2607514A00FE1296 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82CEB340247F9ECD006DA307 /* QuartzCore.framework */; };
 		82E99BE4244FE8950006FED0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 82E99BE3244FE8950006FED0 /* AppDelegate.m */; };
 		82E99BE7244FE8950006FED0 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 82E99BE6244FE8950006FED0 /* SceneDelegate.m */; };
 		82E99BEA244FE8950006FED0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 82E99BE9244FE8950006FED0 /* ViewController.m */; };
@@ -29,6 +29,7 @@
 /* Begin PBXFileReference section */
 		1C8C37C91FA07B75BA6D84B4 /* Pods_MobileSpeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobileSpeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		443B6810F3DE687332A8FB14 /* Pods-MobileSpeed.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobileSpeed.release.xcconfig"; path = "Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed.release.xcconfig"; sourceTree = "<group>"; };
+		8205C2DA25E65E8000ED4533 /* MobileSpeed-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobileSpeed-Bridging-Header.h"; sourceTree = "<group>"; };
 		820BD214248F83D4008D07DB /* MobileSpeedLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MobileSpeedLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8232338D248601F2005E2C0D /* MobileSpeedLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MobileSpeedLib.framework; sourceTree = "<group>"; };
 		825B5C86247FABA100F25260 /* libstdc++.6.0.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.6.0.9.tbd"; path = "usr/lib/libstdc++.6.0.9.tbd"; sourceTree = SDKROOT; };
@@ -61,15 +62,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				82CEB341247F9ECD006DA307 /* QuartzCore.framework in Frameworks */,
 				82E99C0024503CEC0006FED0 /* CoreTelephony.framework in Frameworks */,
 				820BD215248F83D4008D07DB /* MobileSpeedLib.framework in Frameworks */,
 				82CEB345247F9EEA006DA307 /* CoreGraphics.framework in Frameworks */,
 				82CEB33F247F9EC6006DA307 /* CFNetwork.framework in Frameworks */,
-				82CEB343247F9EDE006DA307 /* Security.framework in Frameworks */,
 				825B5C8B247FAC9200F25260 /* libc++.tbd in Frameworks */,
 				82CEB347247F9EF8006DA307 /* Foundation.framework in Frameworks */,
+				82E5FD2A2607514300FE1296 /* Security.framework in Frameworks */,
 				193B5B0E3A4BDC40C501FB53 /* Pods_MobileSpeed.framework in Frameworks */,
+				82E5FD2B2607514A00FE1296 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +94,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8205C2DB25E65F1000ED4533 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				8205C2DC25E65F1700ED4533 /* Swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		8205C2DC25E65F1700ED4533 /* Swift */ = {
+			isa = PBXGroup;
+			children = (
+				8205C2DA25E65E8000ED4533 /* MobileSpeed-Bridging-Header.h */,
+			);
+			path = Swift;
+			sourceTree = "<group>";
+		};
 		8265CBF02474094B001DADF6 /* SDK */ = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +126,7 @@
 				8B4200037582D611B116AACD /* Pods */,
 				82E99BE0244FE8950006FED0 /* Products */,
 				8265CBF02474094B001DADF6 /* SDK */,
+				8205C2DB25E65F1000ED4533 /* Tools */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,7 +178,7 @@
 				82E99BDB244FE8950006FED0 /* Sources */,
 				82E99BDC244FE8950006FED0 /* Frameworks */,
 				82E99BDD244FE8950006FED0 /* Resources */,
-				6F8583AFD05D914877F4E1CA /* [CP] Embed Pods Frameworks */,
+				1C15DE9ECFE602D1182EB29D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -218,6 +236,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1C15DE9ECFE602D1182EB29D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		577DA696E9FA502C42632A14 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -238,23 +273,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6F8583AFD05D914877F4E1CA /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

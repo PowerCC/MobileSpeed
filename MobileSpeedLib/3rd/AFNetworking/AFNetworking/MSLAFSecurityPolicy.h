@@ -23,9 +23,9 @@
 #import <Security/Security.h>
 
 typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
-    AFSSLPinningModeNone,
-    AFSSLPinningModePublicKey,
-    AFSSLPinningModeCertificate,
+    MSLAFSSLPinningModeNone,
+    MSLAFSSLPinningModePublicKey,
+    MSLAFSSLPinningModeCertificate,
 };
 
 /**

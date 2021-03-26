@@ -7,7 +7,6 @@
 //
 
 #import "MSLTools.h"
-#import "MSLMBProgressHUD.h"
 
 @implementation MSLTools
 
@@ -21,21 +20,21 @@
 }
 
 + (void)showPrompt:(NSString *)text superView:(UIView *)superView numberOfLines:(NSInteger)numberOfLines afterDelay:(NSTimeInterval)afterDelay {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (text != nil) {
-            MSLMSLMBProgressHUD *hud = [MSLMSLMBProgressHUD showHUDAddedTo:superView animated:YES];
-            hud.bezelView.style = MSLMBProgressHUDBackgroundStyleSolidColor;
-            hud.bezelView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
-            hud.mode = MSLMBProgressHUDModeText;
-            hud.label.text = text;
-            hud.label.numberOfLines = numberOfLines;
-            hud.label.textColor = [UIColor whiteColor];
-            hud.label.font = [UIFont systemFontOfSize:14];
-            hud.offset = CGPointMake(0.0, (superView.frame.size.height - hud.frame.size.height) / 2.0);
-            [hud hideAnimated:YES afterDelay:afterDelay];
-            hud.completionBlock = nil;
-        }
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        if (text != nil) {
+//            MSLMSLMBProgressHUD *hud = [MSLMSLMBProgressHUD showHUDAddedTo:superView animated:YES];
+//            hud.bezelView.style = MSLMBProgressHUDBackgroundStyleSolidColor;
+//            hud.bezelView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
+//            hud.mode = MSLMBProgressHUDModeText;
+//            hud.label.text = text;
+//            hud.label.numberOfLines = numberOfLines;
+//            hud.label.textColor = [UIColor whiteColor];
+//            hud.label.font = [UIFont systemFontOfSize:14];
+//            hud.offset = CGPointMake(0.0, (superView.frame.size.height - hud.frame.size.height) / 2.0);
+//            [hud hideAnimated:YES afterDelay:afterDelay];
+//            hud.completionBlock = nil;
+//        }
+//    });
 }
 
 + (NSDictionary *)convert2DictionaryWithJSONString:(NSString *)jsonString {

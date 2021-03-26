@@ -12,6 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface SpeedUpTokenModel : MSLJSONModel
+@property (copy, nonatomic) NSString *result;
+@end
+
 @interface SpeedUpAreaInfoModel : MSLJSONModel
 @property (copy, nonatomic) NSString *areaId;
 @property (copy, nonatomic) NSString *code;
