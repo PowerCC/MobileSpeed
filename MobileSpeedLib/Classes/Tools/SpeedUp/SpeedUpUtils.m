@@ -43,15 +43,15 @@
     return downloadTask;
 }
 
-- (void)getToken:(NSString *)urlString res:(nullable void (^)(NSString *token))res {
+- (void)getToken:(NSString *)urlString res:(nullable void (^)(NSString *token, NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))res {
     [self request:urlString method:@"GET" parameters:nil completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         if (error) {
             NSLog(@"Error: %@", error);
-            res(nil);
+            res(nil, nil, nil, nil);
         } else {
             NSLog(@"%@ %@", response, responseObject);
             SpeedUpTokenModel *model = [[SpeedUpTokenModel alloc] initWithDictionary:responseObject error:nil];
-            res(model.result);
+            res(model.result, response, responseObject, error);
         }
     }];
 }
@@ -61,12 +61,12 @@
     [self request:getAreaInfoUrl method:@"POST" parameters:nil completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         if (error) {
             NSLog(@"Error: %@", error);
-            areaInfo(nil);
+            areaInfo(nil, response, responseObject, error);
         } else {
             NSLog(@"%@ %@", response, responseObject);
             SpeedUpAreaInfoModel *model = [[SpeedUpAreaInfoModel alloc] initWithDictionary:responseObject error:nil];
             weakSelf.areaInfoModel = model;
-            areaInfo(model);
+            areaInfo(model, response, responseObject, error);
         }
     }];
 }
@@ -88,7 +88,7 @@
         publicIp == nil ||
         token == nil) {
         if (applyTecentGamesQoS != nil) {
-            applyTecentGamesQoS(nil);
+            applyTecentGamesQoS(nil, nil, nil, nil);
         }
         return;
     }
@@ -160,7 +160,7 @@
 
         NSLog(@"SpeedUpApplyTecentGamesQoSModel: %@", model);
         if (applyTecentGamesQoS != nil) {
-            applyTecentGamesQoS(model);
+            applyTecentGamesQoS(model, response, responseObject, error);
         }
     }];
 }
@@ -171,7 +171,7 @@
         cancelTecentGamesQoS:(CancelTecentGamesQoS)cancelTecentGamesQoS {
     if (correlationId == nil || partnerId == nil || publicIp == nil) {
         if (cancelTecentGamesQoS != nil) {
-            cancelTecentGamesQoS(nil);
+            cancelTecentGamesQoS(nil, nil, nil, nil);
         }
         return;
     }
@@ -196,7 +196,7 @@
 
         NSLog(@"SpeedUpCancelTecentGamesQoSModel: %@", model);
         if (cancelTecentGamesQoS != nil) {
-            cancelTecentGamesQoS(model);
+            cancelTecentGamesQoS(model, response, responseObject, error);
         }
     }];
 }

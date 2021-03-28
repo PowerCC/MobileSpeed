@@ -68,7 +68,9 @@
             // 取消加速
             [[TestUtils getSharedInstance] cancalSpeedUp:correlationId
                                                partnerId:@"csc"
+                                              intranetIp:infoModel.intranetIP
                                                 publicIp:infoModel.publicIP
+                                                areaCode:infoModel.areaInfo.code
                                                   mobile:@"13811111111"
                                                      res:^(SpeedUpCancelTecentGamesQoSModel *_Nonnull qoModel) {
                                                     NSLog(@"%@", qoModel);
@@ -88,7 +90,7 @@
                                         intranetIp:infoModel.intranetIP
                                           publicIp:infoModel.publicIP
                                              ispId:infoModel.areaInfo.ispId
-                                            areaId:infoModel.areaInfo.code
+                                          areaCode:infoModel.areaInfo.code
                                             mobile:@"13811111111"
                                                res:^(SpeedUpApplyTecentGamesQoSModel *_Nonnull qoModel) {
                                                    NSLog(@"%@", qoModel);

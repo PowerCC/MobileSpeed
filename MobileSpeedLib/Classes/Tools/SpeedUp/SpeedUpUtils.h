@@ -17,15 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) BOOL isPrepare;
 @property (strong, nonatomic) SpeedUpAreaInfoModel *areaInfoModel;
 
-typedef void (^AreaInfo)(SpeedUpAreaInfoModel *_Nullable model);
-typedef void (^ApplyTecentGamesQoS)(SpeedUpApplyTecentGamesQoSModel *_Nullable model);
-typedef void (^CancelTecentGamesQoS)(SpeedUpCancelTecentGamesQoSModel *_Nullable model);
+typedef void (^AreaInfo)(SpeedUpAreaInfoModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error);
+typedef void (^ApplyTecentGamesQoS)(SpeedUpApplyTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error);
+typedef void (^CancelTecentGamesQoS)(SpeedUpCancelTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error);
 
 - (void)request:(NSString *)urlString method:(NSString *)method parameters:(nullable id)parameters completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler;
 
 - (NSURLSessionDownloadTask *)downloadFile:(NSString *)fileUrl progress:(void (^)(NSProgress *downloadProgress))downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler;
 
-- (void)getToken:(NSString *)urlString res:(nullable void (^)(NSString *token))res;
+- (void)getToken:(NSString *)urlString res:(nullable void (^)(NSString *token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error))res;
 
 - (void)getAreaInfo:(AreaInfo)areaInfo;
 

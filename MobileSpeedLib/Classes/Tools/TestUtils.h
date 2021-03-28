@@ -142,7 +142,7 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
  @param intranetIp 内网IP
  @param publicIp 公网IP
  @param ispId isPId
- @param areaId 区域码
+ @param areaCode 区域码
  @param mobile 手机号
  @param res SpeedUpCancelTecentGamesQoSModel（code，message）
 */
@@ -153,7 +153,7 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
        intranetIp:(NSString *_Nonnull)intranetIp
          publicIp:(NSString *_Nonnull)publicIp
             ispId:(NSString *_Nonnull)ispId
-           areaId:(NSString *_Nonnull)areaId
+         areaCode:(NSString *_Nonnull)areaCode
            mobile:(NSString *_Nonnull)mobile
               res:(nullable void (^)(SpeedUpApplyTecentGamesQoSModel *qoModel))res;
 
@@ -161,13 +161,17 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
  取消加速
  @param correlationId correlationId
  @param partnerId partnerId
+ @param intranetIp 内网IP
  @param publicIp 公网IP
+ @param areaCode 区域码
  @param mobile 手机号
  @param res SpeedUpCancelTecentGamesQoSModel（code，message）
 */
 - (void)cancalSpeedUp:(NSString *_Nonnull)correlationId
             partnerId:(NSString *_Nonnull)partnerId
+           intranetIp:(NSString *_Nonnull)intranetIp
              publicIp:(NSString *_Nonnull)publicIp
+             areaCode:(NSString *_Nonnull)areaCode
                mobile:(NSString *_Nonnull)mobile
                   res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res;
 
