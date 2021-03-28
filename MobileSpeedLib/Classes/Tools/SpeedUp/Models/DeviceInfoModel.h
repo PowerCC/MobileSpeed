@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SpeedUpModels.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,29 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *intranetIP;
 
 /**
- 城市编码
-*/
-@property (copy, nonatomic) NSString *cityCode;
-
-/**
- 经度
-*/
-@property (copy, nonatomic) NSString *latitude;
-
-/**
- 纬度
-*/
-@property (copy, nonatomic) NSString *longitude;
-
-/**
- 位置
-*/
-@property (copy, nonatomic) NSString *location;
-
-/**
- ispId
-*/
-@property (copy, nonatomic) NSString *ispId;
+ 区域模型
+ */
+@property (strong, nonatomic) SpeedUpAreaInfoModel *areaInfo;
 
 + (instancetype)shared;
 

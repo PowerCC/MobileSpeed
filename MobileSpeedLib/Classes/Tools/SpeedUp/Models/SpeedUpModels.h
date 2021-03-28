@@ -17,11 +17,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface SpeedUpAreaInfoModel : MSLJSONModel
-@property (copy, nonatomic) NSString *areaId;
 @property (copy, nonatomic) NSString *code;
+@property (copy, nonatomic) NSString *countryName;
+@property (copy, nonatomic) NSString *detectServer;
+@property (copy, nonatomic) NSString *duration;
+@property (copy, nonatomic) NSString *guangdongTokenUrl;
 @property (copy, nonatomic) NSString *ip;
 @property (copy, nonatomic) NSString *ispId;
 @property (copy, nonatomic) NSString *regionName;
+@property (copy, nonatomic) NSString *rules;
+@property (copy, nonatomic) NSString *server;
+@property (copy, nonatomic) NSString *tokenUrl;
 @end
 
 @interface SpeedUpApplyTecentGamesQoSModel : MSLJSONModel

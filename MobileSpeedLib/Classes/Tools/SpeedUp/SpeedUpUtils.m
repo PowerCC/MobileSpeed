@@ -57,6 +57,7 @@
 }
 
 - (void)getAreaInfo:(AreaInfo)areaInfo {
+    WeakSelf;
     [self request:getAreaInfoUrl method:@"POST" parameters:nil completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         if (error) {
             NSLog(@"Error: %@", error);
@@ -64,6 +65,7 @@
         } else {
             NSLog(@"%@ %@", response, responseObject);
             SpeedUpAreaInfoModel *model = [[SpeedUpAreaInfoModel alloc] initWithDictionary:responseObject error:nil];
+            weakSelf.areaInfoModel = model;
             areaInfo(model);
         }
     }];
@@ -75,8 +77,8 @@
               qosSreamSpeed:(QosSreamSpeed *_Nullable)qosSreamSpeed
                  intranetIp:(NSString *_Nullable)intranetIp
                    publicIp:(NSString *_Nullable)publicIp
-        applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS
-                      token:(NSString *_Nullable)token {
+                      token:(NSString *_Nullable)token
+        applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS {
     if (partnerId == nil ||
         serviceId == nil ||
         destAddresses == nil ||
@@ -125,7 +127,7 @@
     NSDictionary *userIdentifierDic = @{ @"IP": intranetIp,
                                          @"PublicIP": publicIp };
 
-    NSDictionary *paramsDic = @{ @"Duration": [NSNumber numberWithInteger:3450],
+    NSDictionary *paramsDic = @{ @"Duration": self.areaInfoModel ? self.areaInfoModel.duration : @"3450",
                                  @"OTTchargingId": @"a1234567890",
                                  @"Partner_ID": partnerId,
                                  @"ResourceFeatureProperties": @[resourceFeaturePropertiesDic],
@@ -199,9 +201,9 @@
     }];
 }
 
-- (void)tracertReport:(NSDictionary *)paramsDic completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler {
+- (void)doRequest:(NSString *)urlString method:(NSString *)method paramsDic:(NSDictionary *)paramsDic completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler {
     if (paramsDic && paramsDic.count > 0) {
-        [self request:tracertReportUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
+        [self request:urlString method:method parameters:paramsDic completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
             NSLog(@"%@ %@", response, responseObject);
             if (error) {
                 NSLog(@"Error: %@", error);

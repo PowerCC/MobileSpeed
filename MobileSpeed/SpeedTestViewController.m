@@ -8,7 +8,6 @@
 
 #import "SpeedTestViewController.h"
 #import <MobileSpeedLib/MobileSpeedLib.h>
-//#import "Marco.h"
 //#import "TestUtils.h"
 //#import "SpeedUpUtils.h"
 //#import "Traceroute.h"
@@ -248,7 +247,7 @@
                     NSString *text6 = [NSString stringWithFormat:@"丢包率：%@%%\n", loss];
 
                     textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
-                    
+
 //                    NSMutableArray *timeNumberArray = [NSMutableArray arrayWithCapacity:0];
 //                    for (NSString *t in timeArray) {
 //                        double n = [t doubleValue];
@@ -266,7 +265,6 @@
 //                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 //
 //                    NSLog(@"udp prarms:%@", params);
-
                 }
             }
         }
@@ -350,7 +348,7 @@
 - (IBAction)pingAction:(id)sender {
     if (_pingTesting) {
         _pingTesting = NO;
-        [[TestUtils sharedInstance] stopPing];
+        [[TestUtils getSharedInstance] stopPing];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_timer invalidate];
@@ -387,7 +385,7 @@
                                if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.pingTesting = NO;
-                                   [[TestUtils sharedInstance] stopPing];
+                                   [[TestUtils getSharedInstance] stopPing];
                                    [weakSelf.timer invalidate];
                                }
                                countdown -= 1;
@@ -395,12 +393,12 @@
         }];
 
         __block double index = 1.0;
-        TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text];
-        [tu ping:1000 complete:^(NSMutableString *result) {
-            NSLog(@"%@", result);
-            if ([result containsString:@"TCP conn loss"]) {
+        TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
+        [tu ping:1000 state:@"1" complete:^(NSString *_Nullable pingres) {
+            NSLog(@"%@", pingres);
+            if ([pingres containsString:@"TCP conn loss"]) {
                 [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
-            } else if ([result containsString:@"connect failed"] || [result containsString:@"DNS error"]) {
+            } else if ([pingres containsString:@"connect failed"] || [pingres containsString:@"DNS error"]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                                    [weakSelf.timer invalidate];
                                    [weakSelf.countdownLabel setHidden:YES];
@@ -408,8 +406,8 @@
                                    [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
                                });
             } else {
-                [weakSelf.resultTextArray addObject:result];
-                NSArray *pingTextArray = [result componentsSeparatedByString:@",  "];
+                [weakSelf.resultTextArray addObject:pingres];
+                NSArray *pingTextArray = [pingres componentsSeparatedByString:@",  "];
                 if (pingTextArray && pingTextArray.count >= 2) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                                        NSString *temp = [NSString stringWithFormat:@" ms \nconn to @%@:80", target];
@@ -428,7 +426,7 @@
 - (IBAction)httpAction:(id)sender {
     if (_httpTesting) {
         _httpTesting = NO;
-        [[TestUtils sharedInstance] stopHttpDownloadFile];
+        [[TestUtils getSharedInstance] stopHttpDownloadFile];
         [self enabledAllButton];
     } else {
         _httpTesting = YES;
@@ -445,7 +443,7 @@
         _traceResultTextView.text = @"";
 
         WeakSelf;
-        [[TestUtils sharedInstance] httpDownloadFile:netSpeed progress:^(NSProgress *_Nonnull downloadProgress) {
+        [[TestUtils getSharedInstance] httpDownloadFile:netSpeed state:@"1" progress:^(NSProgress *_Nonnull downloadProgress) {
 //        NSLog(@"%lld\n", downloadProgress.totalUnitCount );
 //        NSLog(@"%lld\n", downloadProgress.completedUnitCount );
             NSString *progessString = [NSString stringWithFormat:@"文件已下载：%.f%%\n", downloadProgress.fractionCompleted * 100];
@@ -486,7 +484,7 @@
     _udpLoss = 0;
     if (_udpTesting) {
         _udpTesting = NO;
-        [[TestUtils sharedInstance] stopUdpTest];
+        [[TestUtils getSharedInstance] stopUdpTest];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_timer invalidate];
@@ -519,13 +517,14 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-                               [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] udpTest:weakSelf];
+                               TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
+                               [tu udpTest:weakSelf state:@"1"];
                                weakSelf.udpStartDate = [NSDate date];
 
                                if (countdown < 0) {
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.udpTesting = NO;
-                                   [[TestUtils sharedInstance] stopUdpTest];
+                                   [[TestUtils getSharedInstance] stopUdpTest];
                                    [weakSelf.timer invalidate];
                                    [weakSelf formatResultText:weakSelf.resultTextView];
                                }
@@ -539,7 +538,7 @@
 - (IBAction)traceAction:(id)sender {
     if (_traceTesting) {
         _traceTesting = NO;
-        [[TestUtils sharedInstance] stopTrace];
+        [[TestUtils getSharedInstance] stopTrace];
         [self enabledAllButton];
     } else if ([self ipCheck]) {
         _traceTesting = YES;
@@ -556,7 +555,8 @@
         _traceResultTextView.text = @"";
 
         WeakSelf;
-        [[TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text] trace:^(TracerouteRecord *record) {
+        TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
+        [tu trace:^(TracerouteRecord *record) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                NSString *text = [NSString stringWithFormat:@"%@%@\n", weakSelf.traceResultTextView.text, record];
                                weakSelf.traceResultTextView.text = text;
@@ -582,9 +582,8 @@
                                params[@"bandWidth"] = @"1.0";
                                params[@"tracertResult"] = @[weakSelf.traceResultTextView.text];
 
-                [[TestUtils sharedInstance] uploadTestResult:@"TRACE" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-                    
-                }];
+                               [[TestUtils getSharedInstance] uploadTestResult:@"TRACE" port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text testParams:params completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
+                               }];
 
                                [weakSelf enabledAllButton];
                            });
@@ -594,16 +593,16 @@
 
 - (IBAction)backAction:(id)sender {
     if (_pingTesting) {
-        [[TestUtils sharedInstance] stopPing];
+        [[TestUtils getSharedInstance] stopPing];
     }
     if (_httpTesting) {
-        [[TestUtils sharedInstance] stopHttpDownloadFile];
+        [[TestUtils getSharedInstance] stopHttpDownloadFile];
     }
     if (_udpTesting) {
-        [[TestUtils sharedInstance] stopUdpTest];
+        [[TestUtils getSharedInstance] stopUdpTest];
     }
     if (_traceTesting) {
-        [[TestUtils sharedInstance] stopTrace];
+        [[TestUtils getSharedInstance] stopTrace];
     }
 
     [self dismissViewControllerAnimated:YES completion:^{

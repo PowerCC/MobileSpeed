@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSString (Extension)
 
 - (BOOL)match:(NSString *)pattern;
++ (NSString *)decryptData:(NSString *)dataStr key:(NSString *)key;
++ (NSMutableArray *)getByte:(NSString *)data;
 
 @end
 

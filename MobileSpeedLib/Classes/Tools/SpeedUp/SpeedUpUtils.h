@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SpeedUpUtils : NSObject
 
 @property (assign, nonatomic) BOOL isPrepare;
+@property (strong, nonatomic) SpeedUpAreaInfoModel *areaInfoModel;
 
 typedef void (^AreaInfo)(SpeedUpAreaInfoModel *_Nullable model);
 typedef void (^ApplyTecentGamesQoS)(SpeedUpApplyTecentGamesQoSModel *_Nullable model);
@@ -34,15 +35,15 @@ typedef void (^CancelTecentGamesQoS)(SpeedUpCancelTecentGamesQoSModel *_Nullable
               qosSreamSpeed:(QosSreamSpeed *_Nullable)QosSreamSpeed
                  intranetIp:(NSString *_Nullable)intranetIp
                    publicIp:(NSString *_Nullable)publicIp
-        applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS
-                      token:(NSString *_Nullable)token;
+                      token:(NSString *_Nullable)token
+        applyTecentGamesQoS:(ApplyTecentGamesQoS)applyTecentGamesQoS;
 
 - (void)cancelTecentGamesQoS:(NSString *_Nullable)correlationId
                    partnerId:(NSString *_Nullable)partnerId
                     publicIp:(NSString *_Nullable)publicIp
         cancelTecentGamesQoS:(CancelTecentGamesQoS)cancelTecentGamesQoS;
 
-- (void)tracertReport:(NSDictionary *)paramsDic completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler;
+- (void)doRequest:(NSString *)urlString method:(NSString *)method paramsDic:(NSDictionary *)paramsDic completionHandler:(nullable void (^)(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

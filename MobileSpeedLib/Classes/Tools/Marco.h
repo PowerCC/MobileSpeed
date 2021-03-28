@@ -13,11 +13,14 @@
 
 #define tracertReportUrl @"http://npm.kgogogo.com/tracertReport"
 
+#define qosReportUrl @"http://npm.kgogogo.com/qosReport"
+
 #define getTokenUrl @"http://42.99.34.130:80/getTokenTest?appid=bcmTest"
 
 #define getCmGuandongTokenUrl @"http://120.196.166.156/bdproxy/jsonp.php?appid=shengyuan"
 
-#define getAreaInfoUrl @"https://4gqos.h2comm.com.cn/areaInfo"
+//#define getAreaInfoUrl @"https://4gqos.h2comm.com.cn/areaInfo"
+#define getAreaInfoUrl @"http://4gqos.h2comm.com.cn:8090/hybAreaInfo"
 
 #define applyUrl @"http://4gqos.h2comm.com.cn:8090/ivsp/services/AACAPIV1/applyTecentGamesQoS"
 
@@ -31,5 +34,11 @@
 
 /// 加速状态
 #define SP_KEY_CORRELATION_ID @"SP_KEY_CORRELATION_ID"
+
+#define kVPNDecrypt_KEY @"testshengyuan2021key"
+
+#define testAppId @"111"
+#define testUserId @"111"
+#define testBusinessId @"13488857472"
 
 #endif /* Marco_h */

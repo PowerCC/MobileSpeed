@@ -6,6 +6,7 @@
 //  Copyright © 2020 邹程. All rights reserved.
 //
 
+#import "NSString+Extension.h"
 #import "TestUtils.h"
 #import "MSLGBDeviceInfo.h"
 #import "MSLFCUUID.h"
@@ -39,33 +40,50 @@
 @implementation TestUtils
 
 static TestUtils *testUtils = nil;
++ (instancetype)getSharedInstance {
+    if (testUtils == nil) {
+        testUtils = [[TestUtils alloc]init];
+        testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
+        
+        testUtils.testHost = defaultIp;
+        testUtils.testPort = defaultPort;
+        testUtils.testDuration = @"10";
+
+        testUtils.appId = testAppId;
+        testUtils.userId = testUserId;
+        testUtils.businessId = testBusinessId;
+        testUtils.businessState = @"1";
+    }
+
+    return testUtils;
+}
 
 + (instancetype)sharedInstance:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState {
     if (testUtils == nil) {
         testUtils = [[TestUtils alloc]init];
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
-
-        if (testUtils.pingResultTextArray == nil) {
-            testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-        }
-
-        if (testUtils.tcpPingResultTextArray == nil) {
-            testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-        }
-
-        if (testUtils.udpResultTextArray == nil) {
-            testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
-        }
-
-        testUtils.testHost = defaultIp;
-        testUtils.testPort = defaultPort;
-        testUtils.testDuration = @"10";
-
-        testUtils.appId = appId;
-        testUtils.userId = userId;
-        testUtils.businessId = businessId;
-        testUtils.businessState = businessState;
     }
+
+    if (testUtils.pingResultTextArray == nil) {
+        testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.tcpPingResultTextArray == nil) {
+        testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.udpResultTextArray == nil) {
+        testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    testUtils.testHost = defaultIp;
+    testUtils.testPort = defaultPort;
+    testUtils.testDuration = @"10";
+
+    testUtils.appId = appId;
+    testUtils.userId = userId;
+    testUtils.businessId = businessId;
+    testUtils.businessState = businessState;
 
     return testUtils;
 }
@@ -74,10 +92,11 @@ static TestUtils *testUtils = nil;
     if (testUtils == nil) {
         testUtils = [[TestUtils alloc]init];
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
-        testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-        testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-        testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
     }
+
+    testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
 
     testUtils.testHost = [host stringByReplacingOccurrencesOfString:@" " withString:@""];
     testUtils.testPort = [port stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -110,9 +129,7 @@ static TestUtils *testUtils = nil;
 
     [_speedUpUtils getAreaInfo:^(SpeedUpAreaInfoModel *_Nullable model) {
         infoModel.publicIP = model.ip;
-        infoModel.cityCode = model.areaId;
-        infoModel.location = model.regionName;
-        infoModel.ispId = model.ispId;
+        infoModel.areaInfo = model;
 
 //        MSLINTULocationManager *locMgr = [MSLINTULocationManager sharedInstance];
 //        [locMgr requestLocationWithDesiredAccuracy:INTULocationAccuracyCity
@@ -461,10 +478,12 @@ static TestUtils *testUtils = nil;
     }
 }
 
-- (void)udpTest:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate {
+- (void)udpTest:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state {
     NSInteger port = [self.testPort integerValue];
     _udpStartDate = [NSDate date];
     _updDelegate = aDelegate;
+
+    self.businessState = state;
 
     if (_udpSocket == nil) {
         _udpSocket = [[MSLGCDAsyncUdpSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
@@ -502,9 +521,9 @@ static TestUtils *testUtils = nil;
         NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
         params[@"appId"] = self.appId;
         params[@"duration"] = duration;
-        params[@"ispId"] = infoModel.ispId;
-        params[@"latitude"] = infoModel.latitude;
-        params[@"longitude"] = infoModel.longitude;
+        params[@"ispId"] = infoModel.areaInfo.ispId;
+//        params[@"latitude"] = infoModel.latitude;
+//        params[@"longitude"] = infoModel.longitude;
         params[@"msgId"] = [MSLTools uuidString];
         params[@"privateIp"] = infoModel.intranetIP;
         params[@"publicIp"] = infoModel.publicIP;
@@ -515,8 +534,25 @@ static TestUtils *testUtils = nil;
         params[@"businessState"] = self.businessState;
         [params addEntriesFromDictionary:testPrarms];
 
-        [_speedUpUtils tracertReport:params completionHandler:completionHandler];
+        [_speedUpUtils doRequest:tracertReportUrl method:@"POST" paramsDic:params completionHandler:completionHandler];
     }
+}
+
+- (void)qosReport:(NSString *)partnerId reqType:(NSString *)reqType reqUrl:(NSString *)reqUrl mobile:(NSString *)mobile {
+    // 构建qosReport参数
+    NSDictionary *qosParamsDic = @{ @"userId": partnerId,
+                                    @"reqType": reqType,
+                                    @"reqUrl": reqUrl,
+                                    @"terminal": @"iOS",
+                                    @"mobile": mobile };
+
+    [_speedUpUtils doRequest:qosReportUrl method:@"POST" paramsDic:qosParamsDic completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
+        if (error) {
+            NSLog(@"Error: %@", error);
+        } else {
+            NSLog(@"response: %@ responseObject: %@", response, responseObject);
+        }
+    }];
 }
 
 - (void)  speedUp:(NSString *_Nonnull)partnerId
@@ -527,6 +563,7 @@ static TestUtils *testUtils = nil;
          publicIp:(NSString *_Nonnull)publicIp
             ispId:(NSString *_Nonnull)ispId
            areaId:(NSString *_Nonnull)areaId
+           mobile:(NSString *_Nonnull)mobile
               res:(nullable void (^)(SpeedUpApplyTecentGamesQoSModel *qoModel))res {
     MSLPhoneNetManager *phoneNetManager = [MSLPhoneNetManager shareInstance];
     if ([phoneNetManager.netGetNetworkInfo.deviceNetInfo.netType isEqualToString:@"WIFI"]) {
@@ -541,33 +578,52 @@ static TestUtils *testUtils = nil;
         res(model);
     } else if (([ispId isEqualToString:@"1"] && [areaId isEqualToString:@"440000"]) || [ispId isEqualToString:@"2"]) {
         WeakSelf;
+
         // 是否需要获取Token
         if ([ispId isEqualToString:@"2"]) {
-            [_speedUpUtils getToken:getTokenUrl res:^(NSString *_Nonnull token) {
+            NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.tokenUrl : @"";
+            NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
+            NSLog(@"decryptUrl = %@", decryptUrl);
+
+            [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token) {
+                [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile];
+
                 [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
                                                  serviceId:serviceId
                                              destAddresses:destAddresses
                                              qosSreamSpeed:qosSreamSpeed
                                                 intranetIp:intranetIp
                                                   publicIp:publicIp
+                                                     token:token
                                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
+                                           [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile];
                                            res(model);
-                                       } token:token];
+                                       }];
             }];
         } else {
-            [_speedUpUtils getToken:getCmGuandongTokenUrl res:^(NSString *_Nonnull token) {
+            NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.guangdongTokenUrl : @"";
+            NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
+            NSLog(@"decryptUrl = %@", decryptUrl);
+
+            [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token) {
+                [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile];
+
                 [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
                                                  serviceId:serviceId
                                              destAddresses:destAddresses
                                              qosSreamSpeed:qosSreamSpeed
                                                 intranetIp:intranetIp
                                                   publicIp:publicIp
+                                                     token:token
                                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
+                                           [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile];
                                            res(model);
-                                       } token:token];
+                                       }];
             }];
         }
     } else {
+        WeakSelf;
+
         // 直接调用加速
         [_speedUpUtils applyTecentGamesQoS:partnerId
                                  serviceId:serviceId
@@ -575,23 +631,28 @@ static TestUtils *testUtils = nil;
                              qosSreamSpeed:qosSreamSpeed
                                 intranetIp:intranetIp
                                   publicIp:publicIp
+                                     token:@""
                        applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model) {
+                           [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile];
                            res(model);
-                       } token:@""];
+                       }];
     }
 }
 
 - (void)cancalSpeedUp:(NSString *_Nonnull)correlationId
             partnerId:(NSString *_Nonnull)partnerId
              publicIp:(NSString *_Nonnull)publicIp
+               mobile:(NSString *_Nonnull)mobile
                   res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res
 {
     if (_speedUpUtils) {
+        WeakSelf;
         // 取消加速
         [_speedUpUtils cancelTecentGamesQoS:correlationId
                                   partnerId:partnerId
                                    publicIp:publicIp
                        cancelTecentGamesQoS:^(SpeedUpCancelTecentGamesQoSModel *_Nullable model) {
+                           [weakSelf qosReport:partnerId reqType:@"qosremove" reqUrl:applyUrl mobile:mobile];
                            res(model);
                        }];
     }

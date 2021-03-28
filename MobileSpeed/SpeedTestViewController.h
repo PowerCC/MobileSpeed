@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-//#import "Charts-Swift.h"
+#import "Charts-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIButton *udpButton;
 @property (weak, nonatomic) IBOutlet UIButton *traceButton;
 
-//@property (weak, nonatomic) IBOutlet BarChartView *chartView;
+@property (weak, nonatomic) IBOutlet BarChartView *chartView;
 
 //@property (weak, nonatomic) IBOutlet UILabel *osVerLabel;
 

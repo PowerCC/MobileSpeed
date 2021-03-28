@@ -29,7 +29,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     WeakSelf;
-    [[TestUtils sharedInstance] getDeviceInfo:^(DeviceInfoModel *_Nullable infoModel) {
+    [[TestUtils getSharedInstance] getDeviceInfo:^(DeviceInfoModel *_Nullable infoModel) {
         NSLog(@"%@", infoModel);
 //        weakSelf.areaInfoModel = model;
         weakSelf.osVerLabel.text = [NSString stringWithFormat:@"iOS版本：%@", infoModel.osVer];
@@ -39,9 +39,9 @@
         weakSelf.extranetIPLabel.text = [NSString stringWithFormat:@"外网IP：%@", infoModel.publicIP];
         weakSelf.intranetIP = infoModel.intranetIP;
         weakSelf.intranetIPLabel.text = [NSString stringWithFormat:@"内网IP：%@", infoModel.intranetIP];
-        weakSelf.locationLabel.text = [NSString stringWithFormat:@"当前位置：%@",  infoModel.location];
-        weakSelf.latitudeLabel.text = [NSString stringWithFormat:@"经度：%@", infoModel.latitude];
-        weakSelf.longitudeLabel.text = [NSString stringWithFormat:@"纬度：%@", infoModel.longitude];
+//        weakSelf.locationLabel.text = [NSString stringWithFormat:@"当前位置：%@",  infoModel.location];
+//        weakSelf.latitudeLabel.text = [NSString stringWithFormat:@"经度：%@", infoModel.latitude];
+//        weakSelf.longitudeLabel.text = [NSString stringWithFormat:@"纬度：%@", infoModel.longitude];
     }];
 }
 
@@ -66,37 +66,40 @@
         NSString *correlationId = [MSLTools loadStringFromUserDefaults:SP_KEY_CORRELATION_ID];
         if (correlationId && correlationId.length > 1) {
             // 取消加速
-            [[TestUtils sharedInstance] cancalSpeedUp:correlationId
-                                            partnerId:@"csc"
-                                             publicIp:infoModel.publicIP res:^(SpeedUpCancelTecentGamesQoSModel *_Nonnull qoModel) {
-                NSLog(@"%@", qoModel);
-                if (qoModel && ([qoModel.ResultCode integerValue] == 0 || [qoModel.ResultCode integerValue] == 201)) {
-                    [weakSelf.speedUpButton setTitle:@"一键加速" forState:UIControlStateNormal];
-                }
+            [[TestUtils getSharedInstance] cancalSpeedUp:correlationId
+                                               partnerId:@"csc"
+                                                publicIp:infoModel.publicIP
+                                                  mobile:@"13811111111"
+                                                     res:^(SpeedUpCancelTecentGamesQoSModel *_Nonnull qoModel) {
+                                                    NSLog(@"%@", qoModel);
+                                                    if (qoModel && ([qoModel.ResultCode integerValue] == 0 || [qoModel.ResultCode integerValue] == 201)) {
+                                                        [weakSelf.speedUpButton setTitle:@"一键加速" forState:UIControlStateNormal];
+                                                    }
 
-                if (qoModel && qoModel.ResultMessage) {
-                    [MSLTools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
-                }
-            }];
+                                                    if (qoModel && qoModel.ResultMessage) {
+                                                        [MSLTools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
+                                                    }
+                                                }];
         } else {
-            [[TestUtils sharedInstance] speedUp:@"csc"
-                                      serviceId:@"Games200K"
-                                  destAddresses:@[infoModel.publicIP]
-                                  qosSreamSpeed:[[QosSreamSpeed alloc] init]
-                                     intranetIp:infoModel.intranetIP
-                                       publicIp:infoModel.publicIP
-                                          ispId:infoModel.ispId
-                                         areaId:infoModel.cityCode
-                                            res:^(SpeedUpApplyTecentGamesQoSModel *_Nonnull qoModel) {
-                NSLog(@"%@", qoModel);
-                if (qoModel && ([qoModel.ResultCode integerValue] == 0 || [qoModel.ResultCode integerValue] == 203)) {
-                    [weakSelf.speedUpButton setTitle:@"取消加速" forState:UIControlStateNormal];
-                }
+            [[TestUtils getSharedInstance] speedUp:@"csc"
+                                         serviceId:@"Games200K"
+                                     destAddresses:@[infoModel.publicIP]
+                                     qosSreamSpeed:[[QosSreamSpeed alloc] init]
+                                        intranetIp:infoModel.intranetIP
+                                          publicIp:infoModel.publicIP
+                                             ispId:infoModel.areaInfo.ispId
+                                            areaId:infoModel.areaInfo.code
+                                            mobile:@"13811111111"
+                                               res:^(SpeedUpApplyTecentGamesQoSModel *_Nonnull qoModel) {
+                                                   NSLog(@"%@", qoModel);
+                                                   if (qoModel && ([qoModel.ResultCode integerValue] == 0 || [qoModel.ResultCode integerValue] == 203)) {
+                                                       [weakSelf.speedUpButton setTitle:@"取消加速" forState:UIControlStateNormal];
+                                                   }
 
-                if (qoModel && qoModel.ResultMessage) {
-                    [MSLTools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
-                }
-            }];
+                                                   if (qoModel && qoModel.ResultMessage) {
+                                                       [MSLTools showPrompt:qoModel.ResultMessage superView:weakSelf.view numberOfLines:0 afterDelay:3.0];
+                                                   }
+                                               }];
         }
     } else {
         [MSLTools showPrompt:@"无法获取区域信息" superView:self.view numberOfLines:1 afterDelay:3.0];

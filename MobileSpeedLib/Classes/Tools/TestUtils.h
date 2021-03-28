@@ -33,6 +33,8 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
 @property (strong, nonatomic) MSLGCDAsyncUdpSocket *udpSocket;
 @property (strong, nonatomic) Traceroute *traceroute;
 
++ (instancetype)getSharedInstance;
+
 /**
  实例
  @param appId App标识
@@ -141,6 +143,7 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
  @param publicIp 公网IP
  @param ispId isPId
  @param areaId 区域码
+ @param mobile 手机号
  @param res SpeedUpCancelTecentGamesQoSModel（code，message）
 */
 - (void)  speedUp:(NSString *_Nonnull)partnerId
@@ -151,6 +154,7 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
          publicIp:(NSString *_Nonnull)publicIp
             ispId:(NSString *_Nonnull)ispId
            areaId:(NSString *_Nonnull)areaId
+           mobile:(NSString *_Nonnull)mobile
               res:(nullable void (^)(SpeedUpApplyTecentGamesQoSModel *qoModel))res;
 
 /**
@@ -158,11 +162,13 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
  @param correlationId correlationId
  @param partnerId partnerId
  @param publicIp 公网IP
+ @param mobile 手机号
  @param res SpeedUpCancelTecentGamesQoSModel（code，message）
 */
 - (void)cancalSpeedUp:(NSString *_Nonnull)correlationId
             partnerId:(NSString *_Nonnull)partnerId
              publicIp:(NSString *_Nonnull)publicIp
+               mobile:(NSString *_Nonnull)mobile
                   res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res;
 
 @end
