@@ -15,7 +15,7 @@
 //#import "DeviceInfoModel.h"
 //#import "GCDAsyncUdpSocket.h"
 
-@interface SpeedTestViewController () <MSLGCDAsyncUdpSocketDelegate, ChartViewDelegate>
+@interface SpeedTestViewController () <MSLGCDAsyncUdpSocketDelegate>//, ChartViewDelegate>
 
 @property (strong, nonatomic) UIColor *enabledColor;
 @property (strong, nonatomic) UIColor *disabledColor;
@@ -67,13 +67,13 @@
 
     _verticalSeparateArray = [[NSMutableArray alloc] init];
 
-    _chartView.delegate = self;
-    _chartView.noDataText = @"暂无测试数据";
-    _chartView.noDataFont = [UIFont systemFontOfSize:14];
-    _chartView.noDataTextColor = [UIColor systemGrayColor];
-    _chartView.drawBarShadowEnabled = NO;
-    _chartView.drawValueAboveBarEnabled = YES;
-    _chartView.maxVisibleCount = 2000;
+//    _chartView.delegate = self;
+//    _chartView.noDataText = @"暂无测试数据";
+//    _chartView.noDataFont = [UIFont systemFontOfSize:14];
+//    _chartView.noDataTextColor = [UIColor systemGrayColor];
+//    _chartView.drawBarShadowEnabled = NO;
+//    _chartView.drawValueAboveBarEnabled = YES;
+//    _chartView.maxVisibleCount = 2000;
 
     [self buttonTitleChange];
     [self setChartData];
@@ -273,30 +273,30 @@
 }
 
 - (void)setChartData {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        BarChartDataSet *set1 = nil;
-        if (self.chartView.data.dataSetCount > 0) {
-            set1 = (BarChartDataSet *)self.chartView.data.dataSets[0];
-            set1.drawIconsEnabled = NO;
-            set1.highlightEnabled = YES;
-            [set1 replaceEntries:self.verticalSeparateArray];
-            [self.chartView.data notifyDataChanged];
-            [self.chartView notifyDataSetChanged];
-        } else {
-            set1 = [[BarChartDataSet alloc] initWithEntries:self.verticalSeparateArray label:@""];
-//            [set1 setColors:ChartColorTemplates.pastel];
-            set1.drawIconsEnabled = NO;
-            set1.highlightEnabled = YES;
-
-            NSMutableArray *dataSets = [[NSMutableArray alloc] init];
-            [dataSets addObject:set1];
-
-            BarChartData *data = [[BarChartData alloc] initWithDataSets:dataSets];
-            [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:10.f]];
-
-            self.chartView.data = data;
-        }
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        BarChartDataSet *set1 = nil;
+//        if (self.chartView.data.dataSetCount > 0) {
+//            set1 = (BarChartDataSet *)self.chartView.data.dataSets[0];
+//            set1.drawIconsEnabled = NO;
+//            set1.highlightEnabled = YES;
+//            [set1 replaceEntries:self.verticalSeparateArray];
+//            [self.chartView.data notifyDataChanged];
+//            [self.chartView notifyDataSetChanged];
+//        } else {
+//            set1 = [[BarChartDataSet alloc] initWithEntries:self.verticalSeparateArray label:@""];
+////            [set1 setColors:ChartColorTemplates.pastel];
+//            set1.drawIconsEnabled = NO;
+//            set1.highlightEnabled = YES;
+//
+//            NSMutableArray *dataSets = [[NSMutableArray alloc] init];
+//            [dataSets addObject:set1];
+//
+//            BarChartData *data = [[BarChartData alloc] initWithDataSets:dataSets];
+//            [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:10.f]];
+//
+//            self.chartView.data = data;
+//        }
+//    });
 }
 
 - (void)buttonTitleChange {
@@ -364,7 +364,7 @@
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_pingTestResultView setHidden:NO];
-        _chartView.data = nil;
+//        _chartView.data = nil;
         [_traceTestResultView setHidden:YES];
 
         [self initTestStartText:_resultTextView];
@@ -413,7 +413,7 @@
                                        NSString *temp = [NSString stringWithFormat:@" ms \nconn to @%@:80", target];
                                        NSString *tempDelay = [pingTextArray[pingTextArray.count - 1] stringByReplacingOccurrencesOfString:temp withString:@""];
                                        NSString *delay = [tempDelay stringByReplacingOccurrencesOfString:@" ms \n" withString:@""];
-                                       [weakSelf.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
+//                                       [weakSelf.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:index y:[delay doubleValue]]];
                                        [weakSelf setChartData];
                                        index++;
                                    });
@@ -438,7 +438,7 @@
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:YES];
         [_pingTestResultView setHidden:YES];
-        _chartView.data = nil;
+//        _chartView.data = nil;
         [_traceTestResultView setHidden:NO];
         _traceResultTextView.text = @"";
 
@@ -500,7 +500,7 @@
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
         [_pingTestResultView setHidden:NO];
-        _chartView.data = nil;
+//        _chartView.data = nil;
         [_traceTestResultView setHidden:YES];
 
         [self initTestStartText:_resultTextView];
@@ -550,7 +550,7 @@
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:YES];
         [_pingTestResultView setHidden:YES];
-        _chartView.data = nil;
+//        _chartView.data = nil;
         [_traceTestResultView setHidden:NO];
         _traceResultTextView.text = @"";
 
@@ -638,7 +638,7 @@
     if (pingTextArray && pingTextArray.count == 2) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *delay = [pingTextArray[1] stringByReplacingOccurrencesOfString:@"ms" withString:@""];
-            [self.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:self.udpIndex y:[delay doubleValue]]];
+//            [self.verticalSeparateArray addObject:[[BarChartDataEntry alloc] initWithX:self.udpIndex y:[delay doubleValue]]];
             [self setChartData];
             self.udpIndex++;
         });
@@ -661,12 +661,12 @@
 
 #pragma mark - ChartViewDelegate
 
-- (void)chartValueSelected:(ChartViewBase *__nonnull)chartView entry:(ChartDataEntry *__nonnull)entry highlight:(ChartHighlight *__nonnull)highlight {
-    NSLog(@"chartValueSelected");
-}
-
-- (void)chartValueNothingSelected:(ChartViewBase *__nonnull)chartView {
-    NSLog(@"chartValueNothingSelected");
-}
+//- (void)chartValueSelected:(ChartViewBase *__nonnull)chartView entry:(ChartDataEntry *__nonnull)entry highlight:(ChartHighlight *__nonnull)highlight {
+//    NSLog(@"chartValueSelected");
+//}
+//
+//- (void)chartValueNothingSelected:(ChartViewBase *__nonnull)chartView {
+//    NSLog(@"chartValueNothingSelected");
+//}
 
 @end

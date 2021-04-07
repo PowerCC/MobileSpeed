@@ -571,7 +571,7 @@ static TestUtils *testUtils = nil;
     }
 
     // 构建qosReport参数
-    NSDictionary *qosParamsDic = @{ @"userId": partnerId,
+    NSDictionary *qosParamsDic = @{ @"userid": partnerId,
                                     @"reqType": reqType,
                                     @"reqUrl": reqUrl,
                                     @"mobile": mobile,
@@ -612,51 +612,52 @@ static TestUtils *testUtils = nil;
         model.ResultCode = @"0";
         model.ResultMessage = @"网络运营商不支持4G加速";
         res(model);
-    } else if (([ispId isEqualToString:@"1"] && [areaCode isEqualToString:@"440000"]) || [areaCode isEqualToString:@"2"]) {
+    } else if ([ispId isEqualToString:@"1"] && [areaCode isEqualToString:@"440000"]) {
         WeakSelf;
 
-        // 是否需要获取Token
-        if ([ispId isEqualToString:@"2"]) {
-            NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.tokenUrl : @"";
-            NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
-            NSLog(@"decryptUrl = %@", decryptUrl);
+        // 广东移动 Token
+        NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.guangdongTokenUrl : @"";
+        NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
+        NSLog(@"decryptUrl = %@", decryptUrl);
 
-            [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
-                [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+        [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
+            [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
 
-                [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
-                                                 serviceId:serviceId
-                                             destAddresses:destAddresses
-                                             qosSreamSpeed:qosSreamSpeed
-                                                intranetIp:intranetIp
-                                                  publicIp:publicIp
-                                                     token:token
-                                       applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
-                                           [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
-                                           res(model);
-                                       }];
-            }];
-        } else {
-            NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.guangdongTokenUrl : @"";
-            NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
-            NSLog(@"decryptUrl = %@", decryptUrl);
+            [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
+                                             serviceId:serviceId
+                                         destAddresses:destAddresses
+                                         qosSreamSpeed:qosSreamSpeed
+                                            intranetIp:intranetIp
+                                              publicIp:publicIp
+                                                 token:token
+                                   applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
+                                       [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+                                       res(model);
+                                   }];
+        }];
+    } else if ([ispId isEqualToString:@"2"]) {
+        WeakSelf;
 
-            [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
-                [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+        // 电信 Token
+        NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.tokenUrl : @"";
+        NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
+        NSLog(@"decryptUrl = %@", decryptUrl);
 
-                [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
-                                                 serviceId:serviceId
-                                             destAddresses:destAddresses
-                                             qosSreamSpeed:qosSreamSpeed
-                                                intranetIp:intranetIp
-                                                  publicIp:publicIp
-                                                     token:token
-                                       applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
-                                           [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
-                                           res(model);
-                                       }];
-            }];
-        }
+        [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
+            [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+
+            [weakSelf.speedUpUtils applyTecentGamesQoS:partnerId
+                                             serviceId:serviceId
+                                         destAddresses:destAddresses
+                                         qosSreamSpeed:qosSreamSpeed
+                                            intranetIp:intranetIp
+                                              publicIp:publicIp
+                                                 token:token
+                                   applyTecentGamesQoS:^(SpeedUpApplyTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
+                                       [weakSelf qosReport:partnerId reqType:@"qosapply" reqUrl:applyUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+                                       res(model);
+                                   }];
+        }];
     } else {
         WeakSelf;
 
@@ -690,7 +691,7 @@ static TestUtils *testUtils = nil;
                                   partnerId:partnerId
                                    publicIp:publicIp
                        cancelTecentGamesQoS:^(SpeedUpCancelTecentGamesQoSModel *_Nullable model, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
-                           [weakSelf qosReport:partnerId reqType:@"qosremove" reqUrl:applyUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
+                           [weakSelf qosReport:partnerId reqType:@"qosremove" reqUrl:cancelUrl mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
                            res(model);
                        }];
     }

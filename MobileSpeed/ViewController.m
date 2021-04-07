@@ -67,7 +67,7 @@
         if (correlationId && correlationId.length > 1) {
             // 取消加速
             [[TestUtils getSharedInstance] cancalSpeedUp:correlationId
-                                               partnerId:@"csc"
+                                               partnerId:@"huiyibao"
                                               intranetIp:infoModel.intranetIP
                                                 publicIp:infoModel.publicIP
                                                 areaCode:infoModel.areaInfo.code
@@ -83,8 +83,8 @@
                                                     }
                                                 }];
         } else {
-            [[TestUtils getSharedInstance] speedUp:@"csc"
-                                         serviceId:@"Games200K"
+            [[TestUtils getSharedInstance] speedUp:@"huiyibao"
+                                         serviceId:@"Games100K"
                                      destAddresses:@[infoModel.publicIP]
                                      qosSreamSpeed:[[QosSreamSpeed alloc] init]
                                         intranetIp:infoModel.intranetIP

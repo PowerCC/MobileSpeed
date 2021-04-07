@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		193B5B0E3A4BDC40C501FB53 /* Pods_MobileSpeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C8C37C91FA07B75BA6D84B4 /* Pods_MobileSpeed.framework */; };
 		820BD215248F83D4008D07DB /* MobileSpeedLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BD214248F83D4008D07DB /* MobileSpeedLib.framework */; };
 		825B5C8B247FAC9200F25260 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 825B5C8A247FAC8A00F25260 /* libc++.tbd */; };
 		82AE4520245138E300DEFD98 /* SpeedTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 82AE451F245138E300DEFD98 /* SpeedTestViewController.m */; };
@@ -31,7 +30,6 @@
 		443B6810F3DE687332A8FB14 /* Pods-MobileSpeed.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobileSpeed.release.xcconfig"; path = "Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed.release.xcconfig"; sourceTree = "<group>"; };
 		8205C2DA25E65E8000ED4533 /* MobileSpeed-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobileSpeed-Bridging-Header.h"; sourceTree = "<group>"; };
 		820BD214248F83D4008D07DB /* MobileSpeedLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MobileSpeedLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8232338D248601F2005E2C0D /* MobileSpeedLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MobileSpeedLib.framework; sourceTree = "<group>"; };
 		825B5C86247FABA100F25260 /* libstdc++.6.0.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.6.0.9.tbd"; path = "usr/lib/libstdc++.6.0.9.tbd"; sourceTree = SDKROOT; };
 		825B5C8A247FAC8A00F25260 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		82AE451E245138E300DEFD98 /* SpeedTestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpeedTestViewController.h; sourceTree = "<group>"; };
@@ -41,6 +39,8 @@
 		82CEB342247F9EDE006DA307 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		82CEB344247F9EEA006DA307 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		82CEB346247F9EF8006DA307 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		82D2790B261DAF7D00B3C0C8 /* Pods_MobileSpeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_MobileSpeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		82D27910261DB01D00B3C0C8 /* MobileSpeedLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MobileSpeedLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82E99BDF244FE8950006FED0 /* MobileSpeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileSpeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82E99BE2244FE8950006FED0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		82E99BE3244FE8950006FED0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -69,7 +69,6 @@
 				825B5C8B247FAC9200F25260 /* libc++.tbd in Frameworks */,
 				82CEB347247F9EF8006DA307 /* Foundation.framework in Frameworks */,
 				82E5FD2A2607514300FE1296 /* Security.framework in Frameworks */,
-				193B5B0E3A4BDC40C501FB53 /* Pods_MobileSpeed.framework in Frameworks */,
 				82E5FD2B2607514A00FE1296 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -80,6 +79,8 @@
 		10D3522B5BF03E564992502D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				82D27910261DB01D00B3C0C8 /* MobileSpeedLib.framework */,
+				82D2790B261DAF7D00B3C0C8 /* Pods_MobileSpeed.framework */,
 				820BD214248F83D4008D07DB /* MobileSpeedLib.framework */,
 				825B5C8A247FAC8A00F25260 /* libc++.tbd */,
 				825B5C86247FABA100F25260 /* libstdc++.6.0.9.tbd */,
@@ -110,14 +111,6 @@
 			path = Swift;
 			sourceTree = "<group>";
 		};
-		8265CBF02474094B001DADF6 /* SDK */ = {
-			isa = PBXGroup;
-			children = (
-				8232338D248601F2005E2C0D /* MobileSpeedLib.framework */,
-			);
-			path = SDK;
-			sourceTree = "<group>";
-		};
 		82E99BD6244FE8950006FED0 = {
 			isa = PBXGroup;
 			children = (
@@ -125,7 +118,6 @@
 				82E99BE1244FE8950006FED0 /* MobileSpeed */,
 				8B4200037582D611B116AACD /* Pods */,
 				82E99BE0244FE8950006FED0 /* Products */,
-				8265CBF02474094B001DADF6 /* SDK */,
 				8205C2DB25E65F1000ED4533 /* Tools */,
 			);
 			sourceTree = "<group>";
@@ -178,7 +170,6 @@
 				82E99BDB244FE8950006FED0 /* Sources */,
 				82E99BDC244FE8950006FED0 /* Frameworks */,
 				82E99BDD244FE8950006FED0 /* Resources */,
-				1C15DE9ECFE602D1182EB29D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -236,23 +227,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1C15DE9ECFE602D1182EB29D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileSpeed/Pods-MobileSpeed-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		577DA696E9FA502C42632A14 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -447,13 +421,9 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
-					"\"Charts\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"Foundation\"",
-					"-framework",
-					"\"IQKeyboardManager\"",
 					"-framework",
 					"\"QuartzCore\"",
 					"-framework",
@@ -467,7 +437,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -496,13 +465,9 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
-					"\"Charts\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"Foundation\"",
-					"-framework",
-					"\"IQKeyboardManager\"",
 					"-framework",
 					"\"QuartzCore\"",
 					"-framework",
@@ -515,7 +480,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 			};
 			name = Release;
 		};

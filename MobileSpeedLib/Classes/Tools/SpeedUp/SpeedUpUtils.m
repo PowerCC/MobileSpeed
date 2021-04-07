@@ -127,13 +127,25 @@
     NSDictionary *userIdentifierDic = @{ @"IP": intranetIp,
                                          @"PublicIP": publicIp };
 
-    NSDictionary *paramsDic = @{ @"Duration": self.areaInfoModel ? self.areaInfoModel.duration : @"3450",
-                                 @"OTTchargingId": @"a1234567890",
-                                 @"Partner_ID": partnerId,
-                                 @"ResourceFeatureProperties": @[resourceFeaturePropertiesDic],
-                                 @"ServiceId": serviceId,
-                                 @"UserIdentifier": userIdentifierDic,
-                                 @"security_token": token };
+    NSDictionary *paramsDic = nil;
+
+    if (token != nil && token.length > 0) {
+        paramsDic = @{ @"Duration": self.areaInfoModel ? self.areaInfoModel.duration : @"3450",
+                       @"OTTchargingId": @"a1234567890",
+                       @"Partner_ID": partnerId,
+                       @"ResourceFeatureProperties": @[resourceFeaturePropertiesDic],
+                       @"ServiceId": serviceId,
+                       @"UserIdentifier": userIdentifierDic,
+                       @"security_token": token };
+    } else {
+        paramsDic = @{ @"Duration": self.areaInfoModel ? self.areaInfoModel.duration : @"3450",
+                       @"OTTchargingId": @"a1234567890",
+                       @"Partner_ID": partnerId,
+                       @"ResourceFeatureProperties": @[resourceFeaturePropertiesDic],
+                       @"ServiceId": serviceId,
+                       @"UserIdentifier": userIdentifierDic };
+    }
+
     NSLog(@"请求参数：%@", paramsDic);
     [self request:applyUrl method:@"POST" parameters:paramsDic completionHandler:^(NSURLResponse *response, id _Nullable responseObject, NSError *_Nullable error) {
         SpeedUpApplyTecentGamesQoSModel *model = [[SpeedUpApplyTecentGamesQoSModel alloc] init];

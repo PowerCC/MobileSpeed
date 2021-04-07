@@ -12,10 +12,10 @@ target 'MobileSpeed' do
 #  pod 'CocoaAsyncSocket'
 #  pod 'INTULocationManager'
 #  pod 'MobileSpeedLib', :git => 'https://github.com/PowerCC/MobileSpeedLib.git'
-  pod 'Charts'
+#  pod 'Charts'
 #  pod 'JSONModel'
 #  pod 'MBProgressHUD'
-  pod 'IQKeyboardManager'
+#  pod 'IQKeyboardManager'
 #  pod 'FCUUID'
 
 end
