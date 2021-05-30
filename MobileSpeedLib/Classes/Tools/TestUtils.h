@@ -175,5 +175,11 @@ typedef void (^DeviceInfoHandler)(DeviceInfoModel *_Nullable infoModel);
                mobile:(NSString *_Nonnull)mobile
                   res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res;
 
+/**
+ 获取最后一次测速结果
+ @return 结果字符串
+*/
+- (NSString *)getLastTracertResult;
+
 @end
 NS_ASSUME_NONNULL_END
