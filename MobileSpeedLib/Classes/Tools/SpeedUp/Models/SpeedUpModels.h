@@ -41,4 +41,26 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *ResultMessage;
 @end
 
+@interface TestResultModel : NSObject
+
+/// 发包数
+@property (copy, nonatomic) NSString *packets;
+
+/// 平均时延
+@property (copy, nonatomic) NSString *delay;
+
+/// 最高时延
+@property (copy, nonatomic) NSString *maxDelay;
+
+/// 最低时延
+@property (copy, nonatomic) NSString *minDelay;
+
+/// 丢包次数
+@property (copy, nonatomic) NSString *lossPacketCount;
+
+/// 丢包率
+@property (copy, nonatomic) NSString *loss;
+
+@end
+
 NS_ASSUME_NONNULL_END

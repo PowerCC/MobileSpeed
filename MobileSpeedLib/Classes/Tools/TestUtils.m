@@ -36,7 +36,6 @@
 @property (copy, nonatomic) NSString *businessId;
 @property (copy, nonatomic) NSString *businessState;
 
-@property (copy, nonatomic) NSString *lastTracertResult;
 @end
 
 @implementation TestUtils
@@ -225,11 +224,7 @@ static TestUtils *testUtils = nil;
                     params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
                     params[@"droppedPacketCount"] = [NSNumber numberWithInteger:lossPacketArray.count];
                     params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
-                    
-                    NSString *tracertResult = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
-                    params[@"tracertResult"] = @[tracertResult];
-                    
-                    weakSelf.lastTracertResult = tracertResult;
+                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 
                     NSLog(@"ping params:%@", params);
 
@@ -311,11 +306,7 @@ static TestUtils *testUtils = nil;
                                 params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
                                 params[@"droppedPacketCount"] = [NSNumber numberWithDouble:[loss doubleValue]];
                                 params[@"droppedPacketRatio"] = [NSNumber numberWithInteger:([loss doubleValue] / weakSelf.tcpPingResultTextArray.count * 100)];
-                                
-                                NSString *tracertResult = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
-                                params[@"tracertResult"] = @[tracertResult];
-                                
-                                weakSelf.lastTracertResult = tracertResult;
+                                params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 
                                 NSLog(@"tcpping params:%@", params);
 
@@ -403,11 +394,7 @@ static TestUtils *testUtils = nil;
                     params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
                     params[@"droppedPacketCount"] = [NSNumber numberWithInteger:lossPacketArray.count];
                     params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
-                    
-                    NSString *tracertResult = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
-                    params[@"tracertResult"] = @[tracertResult];
-                    
-                    weakSelf.lastTracertResult = tracertResult;
+                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
 
                     NSLog(@"udp params:%@", params);
 
@@ -547,6 +534,10 @@ static TestUtils *testUtils = nil;
         params[@"businessId"] = self.businessId;
         params[@"businessState"] = self.businessState;
         [params addEntriesFromDictionary:testPrarms];
+
+        if (_lastTestResultBlock != nil) {
+            _lastTestResultBlock(params);
+        }
 
         [_speedUpUtils doRequest:tracertReportUrl method:@"POST" paramsDic:params completionHandler:completionHandler];
     }
@@ -709,10 +700,6 @@ static TestUtils *testUtils = nil;
                            res(model);
                        }];
     }
-}
-
-- (NSString *)getLastTracertResult {
-    return _lastTracertResult;
 }
 
 #pragma mark - GCDAsyncUdpSocketDelegate

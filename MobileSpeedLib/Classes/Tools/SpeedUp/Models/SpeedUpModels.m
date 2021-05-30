@@ -22,3 +22,7 @@
 @implementation SpeedUpCancelTecentGamesQoSModel
 
 @end
+
+@implementation TestResultModel
+
+@end
