@@ -36,6 +36,8 @@
 @property (copy, nonatomic) NSString *businessId;
 @property (copy, nonatomic) NSString *businessState;
 
+@property (copy, nonatomic) NSString *qosPublicIp;
+
 @end
 
 @implementation TestUtils
@@ -54,6 +56,18 @@ static TestUtils *testUtils = nil;
         testUtils.userId = testUserId;
         testUtils.businessId = testBusinessId;
         testUtils.businessState = @"1";
+    }
+    
+    if (testUtils.pingResultTextArray == nil) {
+        testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.tcpPingResultTextArray == nil) {
+        testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.udpResultTextArray == nil) {
+        testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
     }
 
     return testUtils;
@@ -95,9 +109,17 @@ static TestUtils *testUtils = nil;
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
     }
 
-    testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-    testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-    testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    if (testUtils.pingResultTextArray == nil) {
+        testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.tcpPingResultTextArray == nil) {
+        testUtils.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
+
+    if (testUtils.udpResultTextArray == nil) {
+        testUtils.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    }
 
     testUtils.testHost = [host stringByReplacingOccurrencesOfString:@" " withString:@""];
     testUtils.testPort = [port stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -536,6 +558,7 @@ static TestUtils *testUtils = nil;
         [params addEntriesFromDictionary:testPrarms];
 
         if (_lastTestResultBlock != nil) {
+            NSLog(@"lastTestResultBlock 回调了");
             _lastTestResultBlock(params);
         }
 
@@ -624,6 +647,12 @@ static TestUtils *testUtils = nil;
         NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.guangdongTokenUrl : @"";
         NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
         NSLog(@"decryptUrl = %@", decryptUrl);
+        
+        if (publicIp == nil || publicIp.length == 0) {
+            publicIp = @"0.0.0.0";
+        }
+        
+        _qosPublicIp = publicIp;
 
         [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
             [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
@@ -648,6 +677,12 @@ static TestUtils *testUtils = nil;
         NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
         NSLog(@"decryptUrl = %@", decryptUrl);
 
+        if (publicIp == nil || publicIp.length == 0) {
+            publicIp = @"any";
+        }
+        
+        _qosPublicIp = publicIp;
+        
         [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
             [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
 
@@ -666,6 +701,12 @@ static TestUtils *testUtils = nil;
     } else {
         WeakSelf;
 
+        if (publicIp == nil || publicIp.length == 0) {
+            publicIp = @"0.0.0.0";
+        }
+        
+        _qosPublicIp = publicIp;
+        
         // 直接调用加速
         [_speedUpUtils applyTecentGamesQoS:partnerId
                                  serviceId:serviceId
@@ -692,6 +733,11 @@ static TestUtils *testUtils = nil;
     if (_speedUpUtils) {
         WeakSelf;
         // 取消加速
+        
+        if (publicIp == nil || publicIp.length == 0) {
+            publicIp = _qosPublicIp;
+        }
+        
         [_speedUpUtils cancelTecentGamesQoS:correlationId
                                   partnerId:partnerId
                                    publicIp:publicIp

@@ -77,6 +77,10 @@
 
     [self buttonTitleChange];
     [self setChartData];
+    
+    [TestUtils getSharedInstance].lastTestResultBlock = ^(NSDictionary * _Nonnull lastTestResult) {
+        NSLog(@"%@", lastTestResult);
+    };
 }
 
 - (BOOL)ipCheck {
