@@ -36,8 +36,6 @@
 @property (copy, nonatomic) NSString *businessId;
 @property (copy, nonatomic) NSString *businessState;
 
-@property (copy, nonatomic) NSString *qosPublicIp;
-
 @end
 
 @implementation TestUtils
@@ -57,7 +55,7 @@ static TestUtils *testUtils = nil;
         testUtils.businessId = testBusinessId;
         testUtils.businessState = @"1";
     }
-    
+
     if (testUtils.pingResultTextArray == nil) {
         testUtils.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
     }
@@ -597,6 +595,42 @@ static TestUtils *testUtils = nil;
     if (error != nil) {
         msg = error.description;
     }
+    
+    if (partnerId == nil || partnerId.length == 0) {
+        partnerId = @"";
+    }
+    
+    if (reqType == nil || reqType.length == 0) {
+        reqType = @"";
+    }
+    
+    if (reqUrl == nil || reqUrl.length == 0) {
+        reqUrl = @"";
+    }
+    
+    if (mobile == nil || mobile.length == 0) {
+        mobile = @"";
+    }
+    
+    if (publicip == nil || publicip.length == 0) {
+        publicip = @"";
+    }
+    
+    if (privateip == nil || privateip.length == 0) {
+        privateip = @"";
+    }
+    
+    if (areacode == nil || areacode.length == 0) {
+        areacode = @"";
+    }
+    
+    if (result == nil || result.length == 0) {
+        result = @"";
+    }
+    
+    if (msg == nil || msg.length == 0) {
+        msg = @"";
+    }
 
     // 构建qosReport参数
     NSDictionary *qosParamsDic = @{ @"userid": partnerId,
@@ -647,12 +681,10 @@ static TestUtils *testUtils = nil;
         NSString *url = _speedUpUtils.areaInfoModel ? _speedUpUtils.areaInfoModel.guangdongTokenUrl : @"";
         NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
         NSLog(@"decryptUrl = %@", decryptUrl);
-        
-        if (publicIp == nil || publicIp.length == 0) {
-            publicIp = @"0.0.0.0";
+
+        if (destAddresses == nil || destAddresses.count == 0) {
+            destAddresses = @[@"0.0.0.0"];
         }
-        
-        _qosPublicIp = publicIp;
 
         [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
             [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
@@ -677,12 +709,10 @@ static TestUtils *testUtils = nil;
         NSString *decryptUrl = [NSString decryptData:url key:kVPNDecrypt_KEY];
         NSLog(@"decryptUrl = %@", decryptUrl);
 
-        if (publicIp == nil || publicIp.length == 0) {
-            publicIp = @"any";
+        if (destAddresses == nil || destAddresses.count == 0) {
+            destAddresses = @[@"any"];
         }
-        
-        _qosPublicIp = publicIp;
-        
+
         [_speedUpUtils getToken:decryptUrl res:^(NSString *_Nonnull token, NSURLResponse *_Nullable response, id _Nullable responseObject, NSError *_Nullable error) {
             [weakSelf qosReport:partnerId reqType:@"token" reqUrl:url mobile:mobile publicip:publicIp privateip:intranetIp areacode:areaCode response:response responseObject:responseObject error:error];
 
@@ -701,12 +731,10 @@ static TestUtils *testUtils = nil;
     } else {
         WeakSelf;
 
-        if (publicIp == nil || publicIp.length == 0) {
-            publicIp = @"0.0.0.0";
+        if (destAddresses == nil || destAddresses.count == 0) {
+            destAddresses = @[@"0.0.0.0"];
         }
-        
-        _qosPublicIp = publicIp;
-        
+
         // 直接调用加速
         [_speedUpUtils applyTecentGamesQoS:partnerId
                                  serviceId:serviceId
@@ -733,10 +761,6 @@ static TestUtils *testUtils = nil;
     if (_speedUpUtils) {
         WeakSelf;
         // 取消加速
-        
-        if (publicIp == nil || publicIp.length == 0) {
-            publicIp = _qosPublicIp;
-        }
         
         [_speedUpUtils cancelTecentGamesQoS:correlationId
                                   partnerId:partnerId

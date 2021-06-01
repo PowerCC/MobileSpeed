@@ -85,7 +85,7 @@
         } else {
             [[TestUtils getSharedInstance] speedUp:@"huiyibao"
                                          serviceId:@"Games100K"
-                                     destAddresses:@[infoModel.publicIP]
+                                     destAddresses:@[]
                                      qosSreamSpeed:[[QosSreamSpeed alloc] init]
                                         intranetIp:infoModel.intranetIP
                                           publicIp:infoModel.publicIP
