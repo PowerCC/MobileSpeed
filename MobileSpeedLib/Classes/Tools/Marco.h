@@ -28,9 +28,9 @@
 
 #define netSpeed @"http://120.52.72.43:8081/test.mp4"
 
-#define defaultIp @"120.52.72.43"
+#define defaultIp @"45.120.216.40" //@"120.52.72.43"
 
-#define defaultPort @"80"
+#define defaultPort @"12345" // @"80"
 
 /// 加速状态
 #define SP_KEY_CORRELATION_ID @"SP_KEY_CORRELATION_ID"

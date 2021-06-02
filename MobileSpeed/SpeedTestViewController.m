@@ -516,6 +516,8 @@
         _resultTextArray = [NSMutableArray arrayWithCapacity:0];
 
         WeakSelf;
+        
+        
 
         _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{

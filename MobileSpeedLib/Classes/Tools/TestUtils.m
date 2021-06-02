@@ -595,39 +595,39 @@ static TestUtils *testUtils = nil;
     if (error != nil) {
         msg = error.description;
     }
-    
+
     if (partnerId == nil || partnerId.length == 0) {
         partnerId = @"";
     }
-    
+
     if (reqType == nil || reqType.length == 0) {
         reqType = @"";
     }
-    
+
     if (reqUrl == nil || reqUrl.length == 0) {
         reqUrl = @"";
     }
-    
+
     if (mobile == nil || mobile.length == 0) {
         mobile = @"";
     }
-    
+
     if (publicip == nil || publicip.length == 0) {
         publicip = @"";
     }
-    
+
     if (privateip == nil || privateip.length == 0) {
         privateip = @"";
     }
-    
+
     if (areacode == nil || areacode.length == 0) {
         areacode = @"";
     }
-    
+
     if (result == nil || result.length == 0) {
         result = @"";
     }
-    
+
     if (msg == nil || msg.length == 0) {
         msg = @"";
     }
@@ -761,7 +761,7 @@ static TestUtils *testUtils = nil;
     if (_speedUpUtils) {
         WeakSelf;
         // 取消加速
-        
+
         [_speedUpUtils cancelTecentGamesQoS:correlationId
                                   partnerId:partnerId
                                    publicIp:publicIp
@@ -789,9 +789,11 @@ static TestUtils *testUtils = nil;
 - (void)udpSocket:(MSLGCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag {
     NSLog(@"发送信息成功");
 
-    NSTimeInterval d1 = [_udpStartDate timeIntervalSince1970] * 1000;
-    NSTimeInterval d2 = [[NSDate date] timeIntervalSince1970] * 1000;
-    NSTimeInterval dateDelay = d2 - d1;
+//    NSTimeInterval d1 = [_udpStartDate timeIntervalSince1970] * 1000;
+//    NSTimeInterval d2 = [[NSDate date] timeIntervalSince1970] * 1000;
+//    NSTimeInterval dateDelay = d2 - d1;
+
+    NSTimeInterval dateDelay = [[NSDate date] timeIntervalSinceDate:_udpStartDate] * 1000;
 
     NSString *udpDelay = [NSString stringWithFormat:@"%.3f", dateDelay];
 
@@ -799,7 +801,7 @@ static TestUtils *testUtils = nil;
     if (_udpIndex == count) {
         _udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, (long)_udpLoss, udpDelay];
     } else {
-        _udpTestString = [NSString stringWithFormat:@"64 bytes form 120.52.72.43: icmp_seq=0 ttl=0 time=%@ms", udpDelay];
+        _udpTestString = [NSString stringWithFormat:@"64 bytes form %@: icmp_seq=0 ttl=0 time=%@ms", _testHost, udpDelay];
     }
 
     [self.udpResultTextArray addObject:_udpTestString];
