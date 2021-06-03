@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface SpeedUpAreaInfoModel : MSLJSONModel
+@property (copy, nonatomic) NSString *areaId;
 @property (copy, nonatomic) NSString *code;
 @property (copy, nonatomic) NSString *countryName;
 @property (copy, nonatomic) NSString *detectServer;

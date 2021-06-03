@@ -70,7 +70,7 @@
                                                partnerId:@"huiyibao"
                                               intranetIp:infoModel.intranetIP
                                                 publicIp:infoModel.publicIP
-                                                areaCode:infoModel.areaInfo.code
+                                                areaCode:infoModel.areaInfo.areaId
                                                   mobile:@"13811111111"
                                                      res:^(SpeedUpCancelTecentGamesQoSModel *_Nonnull qoModel) {
                                                     NSLog(@"%@", qoModel);
@@ -90,7 +90,7 @@
                                         intranetIp:infoModel.intranetIP
                                           publicIp:infoModel.publicIP
                                              ispId:infoModel.areaInfo.ispId
-                                          areaCode:infoModel.areaInfo.code
+                                          areaCode:infoModel.areaInfo.areaId
                                             mobile:@"13811111111"
                                                res:^(SpeedUpApplyTecentGamesQoSModel *_Nonnull qoModel) {
                                                    NSLog(@"%@", qoModel);
