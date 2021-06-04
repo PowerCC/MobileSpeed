@@ -107,10 +107,12 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
 
 /**
  udp检测
+ @param count 测试次数
  @param aDelegate GCDAsyncUdpSocketDelegate 代理
  @param state 加速状态 1加速前 2加速后
+ @param automaticStop 到达测试次数后是否自动停止
 */
-- (void)udpTest:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state;
+- (void)udpTest:(NSUInteger)count delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop;
 
 /**
  停止udp探测（文件下载）

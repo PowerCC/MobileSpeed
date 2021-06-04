@@ -523,8 +523,7 @@
 		                  dispatch_async(dispatch_get_main_queue(), ^{
 							 weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
-							 TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text duration:weakSelf.timeTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
-							 [tu udpTest:weakSelf state:@"1"];
+							 
 							 weakSelf.udpStartDate = [NSDate date];
 
 							 if (countdown < 0) {
@@ -538,6 +537,9 @@
 							 countdown -= 1;
 						 });
 			  }];
+        
+        TestUtils *tu = [TestUtils sharedInstance:_ipTextField.text port:_portTextField.text duration:_timeTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
+        [tu udpTest:1000 delegate:self state:@"1" automaticStop:YES];
 	}
 }
 
