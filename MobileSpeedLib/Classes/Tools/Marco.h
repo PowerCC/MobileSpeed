@@ -37,8 +37,8 @@
 
 #define kVPNDecrypt_KEY @"testshengyuan2021key"
 
-#define testAppId @"111"
-#define testUserId @"111"
+#define testAppId @"zhongxin"
+#define testUserId @"huiyibao"
 #define testBusinessId @"13488857472"
 
 #endif /* Marco_h */

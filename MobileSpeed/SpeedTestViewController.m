@@ -21,9 +21,13 @@
 @property (strong, nonatomic) UIColor *enabledColor;
 @property (strong, nonatomic) UIColor *disabledColor;
 
-@property (strong, nonatomic) NSTimer *timer;
+@property (strong, nonatomic) NSTimer *pingTimer;
+@property (strong, nonatomic) NSTimer *udpTimer;
+
 @property (strong, nonatomic) NSMutableArray *verticalSeparateArray;
-@property (strong, nonatomic) NSMutableArray *resultTextArray;
+@property (strong, nonatomic) NSMutableArray *pingResultTextArray;
+@property (strong, nonatomic) NSMutableArray *tcpPingResultTextArray;
+@property (strong, nonatomic) NSMutableArray *udpResultTextArray;
 
 @property (strong, nonatomic) SpeedUpUtils *speedUpUtils;
 
@@ -55,8 +59,11 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_timer invalidate];
-    _timer = nil;
+    [_pingTimer invalidate];
+    _pingTimer = nil;
+
+    [_udpTimer invalidate];
+    _udpTimer = nil;
 }
 
 - (void)initUI {
@@ -166,8 +173,8 @@
 
 - (void)formatTcpPingResultText:(UITextView *)textView {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.resultTextArray.count > 0) {
-            NSString *text = self.resultTextArray[self.resultTextArray.count - 1];
+        if (self.tcpPingResultTextArray.count > 0) {
+            NSString *text = self.tcpPingResultTextArray[self.tcpPingResultTextArray.count - 1];
             if (text && text.length > 0) {
                 if ([text containsString:@"connect failed"] || [text containsString:@"DNS error"]) {
                     textView.text = @"测试失败，网络连接错误！";
@@ -188,12 +195,12 @@
                                 //最小值
                                 double minTime = [min doubleValue];
 
-                                NSString *text1 = [NSString stringWithFormat:@"发包数：%lu\n", (unsigned long)self.resultTextArray.count];
+                                NSString *text1 = [NSString stringWithFormat:@"发包数：%lu\n", (unsigned long)self.tcpPingResultTextArray.count];
                                 NSString *text2 = [NSString stringWithFormat:@"平均时延：%@ms\n", avg];
                                 NSString *text3 = [NSString stringWithFormat:@"最高时延：%.3fms\n", maxTime];
                                 NSString *text4 = [NSString stringWithFormat:@"最低时延：%.3fms\n", minTime];
                                 NSString *text5 = [NSString stringWithFormat:@"丢包次数：%@\n", loss];
-                                NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / self.resultTextArray.count * 100)];
+                                NSString *text6 = [NSString stringWithFormat:@"丢包率：%.f%%\n", ([loss doubleValue] / self.tcpPingResultTextArray.count * 100)];
 
                                 textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
                             }
@@ -208,13 +215,13 @@
     });
 }
 
-- (void)formatResultText:(UITextView *)textView {
+- (void)formatPingResultText:(UITextView *)textView {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.resultTextArray && self.resultTextArray.count > 0) {
+        if (self.pingResultTextArray && self.pingResultTextArray.count > 0) {
             NSMutableArray *lossPacketArray = [NSMutableArray arrayWithCapacity:0];
             NSMutableArray *timeArray = [NSMutableArray arrayWithCapacity:0];
 
-            for (NSString *pingText in self.resultTextArray) {
+            for (NSString *pingText in self.pingResultTextArray) {
                 if ([pingText containsString:@"0 bytes form"]) {
                     [lossPacketArray addObject:pingText];
                 } else if ([pingText containsString:@"packets transmitted"] == NO) {
@@ -237,7 +244,76 @@
             //最小值
             double minTime = [[timeArray valueForKeyPath:@"@min.doubleValue"] doubleValue];
 
-            NSString *finalPingText = self.resultTextArray.lastObject;
+            NSString *finalPingText = self.pingResultTextArray.lastObject;
+            if (finalPingText) {
+                NSArray *finalPingTextArray = [finalPingText componentsSeparatedByString:@" , "];
+                if (finalPingTextArray && finalPingTextArray.count == 4) {
+                    NSString *packets = [finalPingTextArray[0] stringByReplacingOccurrencesOfString:@" packets transmitted" withString:@""];
+                    NSString *delay = [finalPingTextArray[2] stringByReplacingOccurrencesOfString:@"delay:" withString:@""];
+                    NSString *loss = [finalPingTextArray[1] stringByReplacingOccurrencesOfString:@"loss:" withString:@""];
+                    NSString *text1 = [NSString stringWithFormat:@"发包数：%@\n", packets];
+                    NSString *text2 = [NSString stringWithFormat:@"平均时延：%@\n", delay];
+                    NSString *text3 = [NSString stringWithFormat:@"最高时延：%.3fms\n", maxTime];
+                    NSString *text4 = [NSString stringWithFormat:@"最低时延：%.3fms\n", minTime];
+                    NSString *text5 = [NSString stringWithFormat:@"丢包次数：%lu\n", (unsigned long)lossPacketArray.count];
+                    NSString *text6 = [NSString stringWithFormat:@"丢包率：%@%%\n", loss];
+
+                    textView.text = [NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6];
+
+//                    NSMutableArray *timeNumberArray = [NSMutableArray arrayWithCapacity:0];
+//                    for (NSString *t in timeArray) {
+//                        double n = [t doubleValue];
+//                        [timeNumberArray addObject:[NSNumber numberWithDouble:n]];
+//                    }
+//
+//                    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+//                    params[@"totalPacketCount"] = [NSNumber numberWithInteger:[packets integerValue]];
+//                    params[@"allDelayMillis"] = timeNumberArray;
+//                    params[@"averageDelayMillis"] = [NSNumber numberWithDouble:[[delay stringByReplacingOccurrencesOfString:@"ms" withString:@""] doubleValue]];
+//                    params[@"maxDelayMillis"] = [NSNumber numberWithDouble:maxTime];
+//                    params[@"minDelayMillis"] = [NSNumber numberWithDouble:minTime];
+//                    params[@"droppedPacketCount"] = [NSNumber numberWithInteger:lossPacketArray.count];
+//                    params[@"droppedPacketRatio"] = [NSNumber numberWithDouble:[loss doubleValue]];
+//                    params[@"tracertResult"] = @[[NSString stringWithFormat:@"%@%@%@%@%@%@", text1, text2, text3, text4, text5, text6]];
+//
+//                    NSLog(@"udp prarms:%@", params);
+                }
+            }
+        }
+        [self enabledAllButton];
+    });
+}
+
+- (void)formatUdpResultText:(UITextView *)textView {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.udpResultTextArray && self.udpResultTextArray.count > 0) {
+            NSMutableArray *lossPacketArray = [NSMutableArray arrayWithCapacity:0];
+            NSMutableArray *timeArray = [NSMutableArray arrayWithCapacity:0];
+
+            for (NSString *pingText in self.udpResultTextArray) {
+                if ([pingText containsString:@"0 bytes form"]) {
+                    [lossPacketArray addObject:pingText];
+                } else if ([pingText containsString:@"packets transmitted"] == NO) {
+                    NSArray *tempArray = [pingText componentsSeparatedByString:@"time="];
+                    if (tempArray) {
+                        NSString *tempTime = tempArray.lastObject;
+                        if (tempTime) {
+                            NSString *time = [tempTime stringByReplacingOccurrencesOfString:@"ms" withString:@""];
+                            if (time) {
+                                [timeArray addObject:time];
+                            }
+                        }
+                    }
+                }
+            }
+
+            //最大值
+            double maxTime = [[timeArray valueForKeyPath:@"@max.doubleValue"] doubleValue];
+
+            //最小值
+            double minTime = [[timeArray valueForKeyPath:@"@min.doubleValue"] doubleValue];
+
+            NSString *finalPingText = self.udpResultTextArray.lastObject;
             if (finalPingText) {
                 NSArray *finalPingTextArray = [finalPingText componentsSeparatedByString:@" , "];
                 if (finalPingTextArray && finalPingTextArray.count == 4) {
@@ -356,8 +432,8 @@
         [[TestUtils getSharedInstance] stopPing];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
-        [_timer invalidate];
-        [self formatTcpPingResultText:_resultTextView];
+        [_pingTimer invalidate];
+        [self formatPingResultText:_resultTextView];
         [self enabledAllButton];
     } else if ([self ipCheck]) {
         _pingTesting = YES;
@@ -380,10 +456,10 @@
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
-        _resultTextArray = [NSMutableArray arrayWithCapacity:0];
+        _pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
 
         WeakSelf;
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
+        _pingTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
@@ -391,7 +467,8 @@
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.pingTesting = NO;
                                    [[TestUtils getSharedInstance] stopPing];
-                                   [weakSelf.timer invalidate];
+                                   [weakSelf.pingTimer invalidate];
+                                   [weakSelf formatPingResultText:weakSelf.resultTextView];
                                }
                                countdown -= 1;
                            });
@@ -399,19 +476,19 @@
 
         __block double index = 1.0;
         TestUtils *tu = [TestUtils sharedInstance:weakSelf.ipTextField.text port:weakSelf.portTextField.text appId:testAppId userId:testUserId businessId:testBusinessId businessState:@"1"];
-        [tu ping:1000 duration:10 state:@"1" complete:^(NSString *_Nullable pingres) {
+        [tu ping:1000 duration:5 state:@"1" complete:^(NSString *_Nullable pingres) {
             NSLog(@"%@", pingres);
             if ([pingres containsString:@"TCP conn loss"]) {
                 [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
             } else if ([pingres containsString:@"connect failed"] || [pingres containsString:@"DNS error"]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                                   [weakSelf.timer invalidate];
+                                   [weakSelf.pingTimer invalidate];
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.pingTesting = NO;
-                                   [weakSelf formatTcpPingResultText:weakSelf.resultTextView];
+                                   [weakSelf formatPingResultText:weakSelf.resultTextView];
                                });
             } else {
-                [weakSelf.resultTextArray addObject:pingres];
+                [weakSelf.pingResultTextArray addObject:pingres];
                 NSArray *pingTextArray = [pingres componentsSeparatedByString:@",  "];
                 if (pingTextArray && pingTextArray.count >= 2) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -426,6 +503,8 @@
             }
         }];
     }
+
+    [self udpAction:nil];
 }
 
 - (IBAction)httpAction:(id)sender {
@@ -492,8 +571,8 @@
         [[TestUtils getSharedInstance] stopUdpTest];
         _countdownLabel.text = @"";
         [_countdownLabel setHidden:NO];
-        [_timer invalidate];
-        [self formatResultText:_resultTextView];
+        [_udpTimer invalidate];
+        [self formatUdpResultText:_resultTextView];
         [self enabledAllButton];
     } else if ([self ipCheck]) {
         _udpTesting = YES;
@@ -514,11 +593,11 @@
         NSTimeInterval val = [time doubleValue];
         __block NSInteger countdown = val;
 
-        _resultTextArray = [NSMutableArray arrayWithCapacity:0];
+        _udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
 
         WeakSelf;
 
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
+        _udpTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
             dispatch_async(dispatch_get_main_queue(), ^{
                                weakSelf.countdownLabel.text = [NSString stringWithFormat:@"还剩%ld秒", (long)countdown];
 
@@ -528,15 +607,15 @@
                                    [weakSelf.countdownLabel setHidden:YES];
                                    weakSelf.udpTesting = NO;
                                    [[TestUtils getSharedInstance] stopUdpTest];
-                                   [weakSelf.timer invalidate];
-                                   [weakSelf formatResultText:weakSelf.resultTextView];
+                                   [weakSelf.udpTimer invalidate];
+                                   [weakSelf formatUdpResultText:weakSelf.resultTextView];
                                }
 
                                countdown -= 1;
                            });
         }];
 
-        [self.qosMgr udpTest:1000 duration:10 delegate:self state:@"1" automaticStop:YES];
+        [self.qosMgr udpTest:1000 duration:6 delegate:self state:@"1" automaticStop:YES];
     }
 }
 
@@ -652,7 +731,7 @@
         _udpTestString = [NSString stringWithFormat:@"64 bytes form %@: icmp_seq=0 ttl=0 time=%@ms", _ipTextField.text, udpDelay];
     }
 
-    [_resultTextArray addObject:_udpTestString];
+    [_udpResultTextArray addObject:_udpTestString];
     NSArray *pingTextArray = [_udpTestString componentsSeparatedByString:@"time="];
     if (pingTextArray && pingTextArray.count == 2) {
         dispatch_async(dispatch_get_main_queue(), ^{

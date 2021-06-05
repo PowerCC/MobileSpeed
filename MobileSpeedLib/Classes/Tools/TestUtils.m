@@ -23,6 +23,7 @@
 @property (copy, nonatomic) NSString *udpTestString;
 @property (assign, nonatomic) NSInteger udpIndex;
 @property (assign, nonatomic) NSInteger udpLoss;
+@property (assign, nonatomic) NSString *udpDelay;
 @property (strong, nonatomic) NSDate *udpStartDate;
 @property (strong, nonatomic) NSDate *udpEndDate;
 @property (weak, nonatomic) id<MSLGCDAsyncUdpSocketDelegate> updDelegate;
@@ -253,6 +254,8 @@ static TestUtils *testUtils = nil;
                     [weakSelf uploadTestResult:@"PING" port:@"" duration:weakSelf.testDuration testParams:params completionHandler:^(NSURLResponse *_Nonnull response, id _Nullable responseObject, NSError *_Nullable error) {
                         [weakSelf.pingResultTextArray removeAllObjects];
                     }];
+                } else {
+                    [weakSelf.pingResultTextArray removeAllObjects];
                 }
             } else {
                 [weakSelf.pingResultTextArray removeAllObjects];
@@ -425,6 +428,10 @@ static TestUtils *testUtils = nil;
                         weakSelf.udpLoss = 0;
                         [weakSelf.udpResultTextArray removeAllObjects];
                     }];
+                } else {
+                    weakSelf.udpIndex = 0;
+                    weakSelf.udpLoss = 0;
+                    [weakSelf.udpResultTextArray removeAllObjects];
                 }
             } else {
                 weakSelf.udpIndex = 0;
@@ -433,19 +440,15 @@ static TestUtils *testUtils = nil;
             }
         } else {
             NSLog(@"\nUdpResultTextArray Empty\n");
+            weakSelf.udpIndex = 0;
+            weakSelf.udpLoss = 0;
             [weakSelf.udpResultTextArray removeAllObjects];
         }
     });
 }
 
 - (void)ping:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete {
-    if (_pingResultTextArray == nil) {
-        self.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-    } else {
-        [_pingResultTextArray removeAllObjects];
-    }
-
-    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
+    self.testDuration = [NSString stringWithFormat:@"%ld", (long)duration];
     self.businessState = state;
     [[PhonePingService shareInstance] startPingHost:self.testHost packetCount:count resultHandler:^(NSString *_Nullable pingres) {
         [self.pingResultTextArray addObject:pingres];
@@ -470,13 +473,7 @@ static TestUtils *testUtils = nil;
 }
 
 - (void)tcpPing:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete {
-    if (_tcpPingResultTextArray == nil) {
-        self.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
-    } else {
-        [_tcpPingResultTextArray removeAllObjects];
-    }
-
-    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
+    self.testDuration = [NSString stringWithFormat:@"%ld", (long)duration];
     self.businessState = state;
     NSInteger port = [self.testPort integerValue];
     _tcpPing = [MSLPNTcpPing start:self.testHost port:port count:count complete:^(NSMutableString *result) {
@@ -518,13 +515,7 @@ static TestUtils *testUtils = nil;
 - (void)udpTest:(NSUInteger)count duration:(NSInteger)duration delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop {
     NSLog(@"\n进入udpTest\n");
 
-    if (_udpResultTextArray == nil) {
-        self.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
-    } else {
-        [_udpResultTextArray removeAllObjects];
-    }
-
-    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
+    self.testDuration = [NSString stringWithFormat:@"%ld", (long)duration];
 
     [_timer invalidate];
 
@@ -573,6 +564,11 @@ static TestUtils *testUtils = nil;
 
 - (void)stopUdpTest {
     NSLog(@"\nstopUdpTest\n");
+
+    NSInteger count = [self.testDuration integerValue];
+    self.udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, (long)_udpLoss, _udpDelay];
+    [self.udpResultTextArray addObject:_udpTestString];
+
     [_timer invalidate];
     [_udpSocket pauseReceiving];
     [_udpSocket close];
@@ -872,14 +868,9 @@ static TestUtils *testUtils = nil;
 
     NSTimeInterval dateDelay = [[NSDate date] timeIntervalSinceDate:_udpStartDate] * 1000;
 
-    NSString *udpDelay = [NSString stringWithFormat:@"%.3f", dateDelay];
+    self.udpDelay = [NSString stringWithFormat:@"%.3f", dateDelay];
 
-    NSInteger count = [self.testDuration integerValue];
-    if (_udpIndex == count) {
-        _udpTestString = [NSString stringWithFormat:@"%ld packets transmitted , loss:%ld , delay:%@ms , ttl:0", (long)count, (long)_udpLoss, udpDelay];
-    } else {
-        _udpTestString = [NSString stringWithFormat:@"64 bytes form %@: icmp_seq=0 ttl=0 time=%@ms", _testHost, udpDelay];
-    }
+    self.udpTestString = [NSString stringWithFormat:@"64 bytes form %@: icmp_seq=0 ttl=0 time=%@ms", _testHost, _udpDelay];
 
     [self.udpResultTextArray addObject:_udpTestString];
     _udpIndex++;
