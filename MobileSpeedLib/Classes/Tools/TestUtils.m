@@ -102,7 +102,7 @@ static TestUtils *testUtils = nil;
     return testUtils;
 }
 
-+ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState {
++ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState {
     if (testUtils == nil) {
         testUtils = [[TestUtils alloc]init];
         testUtils.speedUpUtils = [[SpeedUpUtils alloc] init];
@@ -122,12 +122,13 @@ static TestUtils *testUtils = nil;
 
     testUtils.testHost = [host stringByReplacingOccurrencesOfString:@" " withString:@""];
     testUtils.testPort = [port stringByReplacingOccurrencesOfString:@" " withString:@""];
-    testUtils.testDuration = [duration stringByReplacingOccurrencesOfString:@" " withString:@""];
 
     testUtils.appId = appId;
     testUtils.userId = userId;
     testUtils.businessId = businessId;
     testUtils.businessState = businessState;
+
+    NSLog(@"初始化了，host:%@ port:%@ appId:%@ userId:%@ businessId:%@ businessState:%@", host, port, appId, userId, businessId, businessState);
 
     return testUtils;
 }
@@ -437,7 +438,14 @@ static TestUtils *testUtils = nil;
     });
 }
 
-- (void)ping:(NSUInteger)count state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete {
+- (void)ping:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete {
+    if (_pingResultTextArray == nil) {
+        self.pingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    } else {
+        [_pingResultTextArray removeAllObjects];
+    }
+
+    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
     self.businessState = state;
     [[PhonePingService shareInstance] startPingHost:self.testHost packetCount:count resultHandler:^(NSString *_Nullable pingres) {
         [self.pingResultTextArray addObject:pingres];
@@ -461,7 +469,14 @@ static TestUtils *testUtils = nil;
     });
 }
 
-- (void)tcpPing:(NSUInteger)count state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete {
+- (void)tcpPing:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete {
+    if (_tcpPingResultTextArray == nil) {
+        self.tcpPingResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    } else {
+        [_tcpPingResultTextArray removeAllObjects];
+    }
+
+    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
     self.businessState = state;
     NSInteger port = [self.testPort integerValue];
     _tcpPing = [MSLPNTcpPing start:self.testHost port:port count:count complete:^(NSMutableString *result) {
@@ -500,22 +515,32 @@ static TestUtils *testUtils = nil;
     }
 }
 
-- (void)udpTest:(NSUInteger)count delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop {
+- (void)udpTest:(NSUInteger)count duration:(NSInteger)duration delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop {
+    NSLog(@"\n进入udpTest\n");
+
+    if (_udpResultTextArray == nil) {
+        self.udpResultTextArray = [NSMutableArray arrayWithCapacity:0];
+    } else {
+        [_udpResultTextArray removeAllObjects];
+    }
+
+    self.testDuration = [NSString stringWithFormat:@"@%ld", (long)duration];
+
     [_timer invalidate];
 
     NSInteger port = [self.testPort integerValue];
 
-    _updDelegate = aDelegate;
+    self.updDelegate = aDelegate;
 
     self.businessState = state;
 
     if (_udpSocket == nil) {
         _udpSocket = [[MSLGCDAsyncUdpSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        NSLog(@"\n初始化 udpSocket\n");
     }
-    
+
     NSError *error = nil;
 
-    
     [_udpSocket bindToPort:port error:&error];
     if (error) {    //监听错误打印错误信息
         NSLog(@"error:%@", error);
@@ -527,22 +552,27 @@ static TestUtils *testUtils = nil;
 
     WeakSelf;
 
-    _timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
-        NSLog(@"countdown: %ld", (long)countdown);
-        weakSelf.udpStartDate = [NSDate date];
-        [weakSelf.udpSocket sendData:[@"test" dataUsingEncoding:NSUTF8StringEncoding] toHost:weakSelf.testHost port:port withTimeout:-1 tag:0];
-        if (countdown < 0) {
-            [weakSelf.timer invalidate];
-            if (automaticStop) {
-                [[TestUtils getSharedInstance] stopUdpTest];
-            }
-        }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer *_Nonnull timer) {
+                NSLog(@"udp countdown: %ld", (long)countdown);
+                weakSelf.udpStartDate = [NSDate date];
+                [weakSelf.udpSocket sendData:[@"test" dataUsingEncoding:NSUTF8StringEncoding] toHost:weakSelf.testHost port:port withTimeout:-1 tag:0];
+                if (countdown < 0) {
+                    [weakSelf.timer invalidate];
+                    if (automaticStop) {
+                        [[TestUtils getSharedInstance] stopUdpTest];
+                    }
+                }
 
-        countdown -= 1;
-    }];
+                countdown -= 1;
+            }];
+        });
+    });
 }
 
 - (void)stopUdpTest {
+    NSLog(@"\nstopUdpTest\n");
     [_timer invalidate];
     [_udpSocket pauseReceiving];
     [_udpSocket close];
@@ -861,6 +891,7 @@ static TestUtils *testUtils = nil;
 }
 
 - (void)udpSocketDidClose:(MSLGCDAsyncUdpSocket *)sock withError:(NSError *_Nullable)error {
+    NSLog(@"\nerror.debugDescription:%@\n", error.debugDescription);
     if (_updDelegate) {
         [_updDelegate udpSocketDidClose:sock withError:error];
     }

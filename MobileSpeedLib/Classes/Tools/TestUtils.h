@@ -53,13 +53,12 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
  实例
  @param host 测试网址或IP
  @param port 测试端口号
- @param duration 测试时长
  @param appId App标识
  @param userId 用户标识
  @param businessId businessId
  @param businessState businessState
  */
-+ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port duration:(NSString *)duration appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState;
++ (instancetype)sharedInstance:(NSString *)host port:(NSString *)port appId:(NSString *)appId userId:(NSString *)userId businessId:(NSString *)businessId businessState:(NSString *)businessState;
 
 /**
  获取设备信息
@@ -70,9 +69,10 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
 /**
  ping探测
  @param count 测试次数
+ @param duration 测试时长
  @param state 加速状态 1加速前 2加速后
 */
-- (void)ping:(NSUInteger)count state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete;
+- (void)ping:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(NetPingResultHandler _Nonnull)complete;
 
 /**
  停止ping探测
@@ -82,9 +82,10 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
 /**
  tcpping探测
  @param count 测试次数
+ @param duration 测试时长
  @param state 加速状态 1加速前 2加速后
 */
-- (void)tcpPing:(NSUInteger)count state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete;
+- (void)tcpPing:(NSUInteger)count duration:(NSInteger)duration state:(NSString *)state complete:(MSLPNTcpPingHandler _Nonnull)complete;
 
 /**
  停止tcpping探测
@@ -108,11 +109,12 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
 /**
  udp检测
  @param count 测试次数
+ @param duration 测试时长
  @param aDelegate GCDAsyncUdpSocketDelegate 代理
  @param state 加速状态 1加速前 2加速后
  @param automaticStop 到达测试次数后是否自动停止
 */
-- (void)udpTest:(NSUInteger)count delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop;
+- (void)udpTest:(NSUInteger)count duration:(NSInteger)duration delegate:(id<MSLGCDAsyncUdpSocketDelegate>)aDelegate state:(NSString *)state automaticStop:(BOOL)automaticStop;
 
 /**
  停止udp探测（文件下载）
@@ -181,7 +183,6 @@ typedef void (^GetLastTestResult)(NSDictionary *lastTestResult);
              areaCode:(NSString *_Nonnull)areaCode
                mobile:(NSString *_Nonnull)mobile
                   res:(nullable void (^)(SpeedUpCancelTecentGamesQoSModel *qoModel))res;
-
 
 @end
 NS_ASSUME_NONNULL_END
