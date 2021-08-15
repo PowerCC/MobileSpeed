@@ -633,12 +633,12 @@ static TestUtils *testUtils = nil;
 
     NSString *result = @"";
     NSString *msg = @"";
-    SpeedUpCancelTecentGamesQoSModel *model = nil;
+    SpeedTecentGamesQoSModel *model = nil;
 
     _userAreaCode = areacode;
 
     if (resultDic) {
-        model = [[SpeedUpCancelTecentGamesQoSModel alloc] initWithDictionary:resultDic error:nil];
+        model = [[SpeedTecentGamesQoSModel alloc] initWithDictionary:resultDic error:nil];
     }
 
     if (model && model.ResultCode) {

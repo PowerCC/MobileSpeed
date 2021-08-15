@@ -26,20 +26,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *ip;
 @property (copy, nonatomic) NSString *ispId;
 @property (copy, nonatomic) NSString *regionName;
-@property (copy, nonatomic) NSString *rules;
+//@property (copy, nonatomic) NSString *rules;
 @property (copy, nonatomic) NSString *server;
 @property (copy, nonatomic) NSString *tokenUrl;
+@property (copy, nonatomic) NSString *udpCommonAddr;
 @end
 
-@interface SpeedUpApplyTecentGamesQoSModel : MSLJSONModel
+@interface SpeedTecentGamesQoSModel : MSLJSONModel
+@property (copy, nonatomic) NSString *ResultCode;
+@property (copy, nonatomic) NSString *ResultMessage;
+@end
+
+@interface SpeedUpApplyTecentGamesQoSModel : SpeedTecentGamesQoSModel
 @property (copy, nonatomic) NSString *CorrelationId;
-@property (copy, nonatomic) NSString *ResultCode;
-@property (copy, nonatomic) NSString *ResultMessage;
 @end
 
-@interface SpeedUpCancelTecentGamesQoSModel : MSLJSONModel
-@property (copy, nonatomic) NSString *ResultCode;
-@property (copy, nonatomic) NSString *ResultMessage;
+@interface SpeedUpCancelTecentGamesQoSModel : SpeedTecentGamesQoSModel
+
 @end
 
 @interface TestResultModel : NSObject

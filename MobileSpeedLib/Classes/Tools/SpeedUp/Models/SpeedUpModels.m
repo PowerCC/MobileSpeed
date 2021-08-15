@@ -15,6 +15,10 @@
 
 @end
 
+@implementation SpeedTecentGamesQoSModel
+
+@end
+
 @implementation SpeedUpApplyTecentGamesQoSModel
 
 @end
