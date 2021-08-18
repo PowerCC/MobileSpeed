@@ -20,7 +20,28 @@
 }
 
 + (NSString *)decryptData:(NSString *)dataStr key:(NSString *)key {
-    NSArray *dataArr = [[dataStr substringFromIndex:1] componentsSeparatedByString:@"@"];
+    NSLog(@"decryptData dataStr: %@", dataStr);
+
+    if (dataStr == nil) {
+        return @"";
+    }
+
+    if (dataStr.length < 2) {
+        return @"";
+    }
+
+    if (key == nil || key.length == 0) {
+        return @"";
+    }
+
+    NSString *substring = [dataStr substringFromIndex:1];
+
+    NSArray *dataArr = [substring componentsSeparatedByString:@"@"];
+
+    if (dataArr.count == 0) {
+        return @"";
+    }
+
     Byte *tmpList = malloc(dataArr.count);
 
     NSArray *keyArr = [self getByte:key];
@@ -29,7 +50,7 @@
         tmpList[i] = (Byte)(([dataArr[i] integerValue]) - (0xFF & [[keyArr objectAtIndex:(i % keyLen)] integerValue]));
     }
 
-    NSData *adata = [[NSData alloc]initWithBytes:tmpList length:dataArr.count];
+    NSData *adata = [[NSData alloc] initWithBytes:tmpList length:dataArr.count];
     NSString *result = [[NSString alloc] initWithData:adata encoding:NSUTF8StringEncoding];
 
     return result;
